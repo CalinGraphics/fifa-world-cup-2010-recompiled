@@ -1,0 +1,58 @@
+diff --git a/src/system/runtime.cpp b/src/system/runtime.cpp
+index 8b27425..e032add 100644
+--- a/src/system/runtime.cpp
++++ b/src/system/runtime.cpp
+@@ -11,6 +11,7 @@
+ 
+ #include <rex/chrono/clock.h>
+ #include <rex/cvar.h>
++#include <rex/filesystem/devices/disc_image_device.h>
+ #include <rex/filesystem/devices/host_path_device.h>
+ #include <rex/filesystem/devices/null_device.h>
+ #include <rex/filesystem/vfs.h>
+@@ -306,10 +307,17 @@ bool Runtime::SetupVfs() {
+ 
+   // Mount game_data_root as \Device\Harddisk0\Partition1
+   auto mount_path = "\\Device\\Harddisk0\\Partition1";
+-  auto device = std::make_unique<rex::filesystem::HostPathDevice>(
+-      mount_path, abs_game_root, !REXCVAR_GET(allow_game_relative_writes));
++  // A regular file is a disc image (.iso); a folder is an extracted game.
++  std::unique_ptr<rex::filesystem::Device> device;
++  if (std::filesystem::is_regular_file(abs_game_root)) {
++    device = std::make_unique<rex::filesystem::DiscImageDevice>(mount_path, abs_game_root);
++  } else {
++    device = std::make_unique<rex::filesystem::HostPathDevice>(
++        mount_path, abs_game_root, !REXCVAR_GET(allow_game_relative_writes));
++  }
+   if (!device->Initialize()) {
+-    REXSYS_ERROR("Runtime::SetupVfs: Failed to initialize host path device");
++    REXSYS_ERROR("Runtime::SetupVfs: Failed to initialize the game device for {}",
++                 abs_game_root.string());
+     return false;
+   }
+   if (!file_system_->RegisterDevice(std::move(device))) {
+diff --git a/src/ui/rex_app.cpp b/src/ui/rex_app.cpp
+index 9ff54e8..3d28bb2 100644
+--- a/src/ui/rex_app.cpp
++++ b/src/ui/rex_app.cpp
+@@ -205,7 +205,8 @@ bool ReXApp::ConstructRuntime(const PathConfig& paths) {
+     rex::ShowSimpleMessageBox(rex::SimpleMessageBoxType::Error, msg);
+     return false;
+   }
+-  if (!std::filesystem::is_directory(paths.game_data_root)) {
++  if (!std::filesystem::is_directory(paths.game_data_root) &&
++      !std::filesystem::is_regular_file(paths.game_data_root)) {
+     auto msg = fmt::format("--game_data_root does not exist: {}", paths.game_data_root.string());
+     REXLOG_ERROR("{}", msg);
+     rex::ShowSimpleMessageBox(rex::SimpleMessageBoxType::Error, msg);
+@@ -273,7 +274,9 @@ bool ReXApp::ConstructRuntime(const PathConfig& paths) {
+     std::string host_tail{tail};
+     std::replace(host_tail.begin(), host_tail.end(), '\\', '/');
+     auto xex_host = paths.game_data_root / host_tail;
+-    if (!std::filesystem::is_regular_file(xex_host)) {
++    // With a disc image as the root, the XEX is inside the image; the VFS checks it.
++    if (!std::filesystem::is_regular_file(paths.game_data_root) &&
++        !std::filesystem::is_regular_file(xex_host)) {
+       auto msg = fmt::format("Entrypoint XEX not found: {}", xex_host.string());
+       REXLOG_ERROR("{}", msg);
+       rex::ShowSimpleMessageBox(rex::SimpleMessageBoxType::Error, msg);

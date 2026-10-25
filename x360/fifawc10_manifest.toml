@@ -1,0 +1,19 @@
+# Codegen manifest for 2010 FIFA World Cup South Africa (Xbox 360).
+# game_root and file_path point at your own extracted copy (tools/disc.py extract).
+# default.xex is a small loader; the game itself is the fifadllzf.xex module.
+
+[project]
+name = "fifawc10"
+sdk_version = "0.10.0"
+game_root = "../../game-x360"
+
+[entrypoint]
+file_path = "../../game-x360/default.xex"
+out_directory_path = "generated/default"
+includes = ["config/codegen_options.toml", "config/default.toml", "config/default_pointers.toml"]
+
+[[modules]]
+guest_path = "fifadllzf.xex"
+file_path = "../../game-x360/fifadllzf.xex"
+out_directory_path = "generated/fifadllzf"
+includes = ["config/codegen_options.toml", "config/fifadllzf.toml", "config/fifadllzf_pointers.toml"]

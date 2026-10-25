@@ -1,0 +1,6 @@
+# Code generation options shared by both modules.
+# Keep PowerPC registers that never outlive a function in C++ locals so the host
+# compiler can hold them in registers. Only scratch registers are enabled.
+ctr_as_local = true
+xer_as_local = true
+cr_as_local = true

@@ -1,0 +1,41 @@
+# Game data never goes in this repo
+*.iso
+*.dkey
+*.xex
+*.xexp
+*.xex.dll
+*.big
+*.BIN
+*.elf
+*.self
+*.sprx
+*.prx
+game/
+game-x360/
+game-ps3/
+
+# C++ generated from the game's code: local only
+**/generated/
+
+# Build output
+out/
+build/
+*.log
+*.dmp
+
+# Editor / OS
+.vs/
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
+__pycache__/
+*.exe
+
+
+# Built tools and launcher output
+tools/*.exe
+launcher/bin/
+launcher/obj/
+*.bak
+

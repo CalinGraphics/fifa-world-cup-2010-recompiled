@@ -1,0 +1,243 @@
+diff --git a/include/rex/codegen/config.h b/include/rex/codegen/config.h
+index 8200139..e95b29c 100644
+--- a/include/rex/codegen/config.h
++++ b/include/rex/codegen/config.h
+@@ -113,6 +113,8 @@ struct RecompilerConfig {
+   std::unordered_map<uint32_t, MidAsmHook> midAsmHooks;
+   uint32_t longJmpAddress = 0;
+   uint32_t setJmpAddress = 0;
++  // Guest address of this module's dispatch table (0 = right after the image).
++  uint32_t functionTableBase = 0;
+ 
+   // === rexcrt: CRT function address overrides ===
+   // Maps function name -> guest address (e.g. "CreateFileA" -> 0x8248B780)
+diff --git a/include/rex/image_info.h b/include/rex/image_info.h
+index e511437..497a736 100644
+--- a/include/rex/image_info.h
++++ b/include/rex/image_info.h
+@@ -47,6 +47,7 @@ struct PPCImageInfo {
+   bool rexcrt_heap = false;  ///< Set by codegen when [rexcrt] has heap functions
+   RegisterModulesFunc register_modules = nullptr;  ///< Set by codegen for multi-binary projects
+   PPCCodegenFlags codegen_flags{};                 ///< Set by codegen from the config flags
++  u32 function_table_base = 0;  ///< Dispatch table address (0 = image_base + image_size)
+ };
+ 
+ }  // namespace rex
+diff --git a/include/rex/system/function_dispatcher.h b/include/rex/system/function_dispatcher.h
+index 916f3d6..1d8d1ef 100644
+--- a/include/rex/system/function_dispatcher.h
++++ b/include/rex/system/function_dispatcher.h
+@@ -81,7 +81,8 @@ class FunctionDispatcher : public IModuleRegistrar {
+   // Set is_entrypoint=true exactly once for the host-loaded entrypoint so
+   // AllocateThunk(caller_address=0) can route to its pool.
+   bool InitializeFunctionTable(uint32_t code_base, uint32_t code_size, uint32_t image_base,
+-                               uint32_t image_size, bool is_entrypoint = false);
++                               uint32_t image_size, bool is_entrypoint = false,
++                               uint32_t table_base = 0);
+   bool SetFunction(uint32_t guest_address, ::PPCFunc* func) override;
+   ::PPCFunc* GetFunction(uint32_t guest_address);
+   bool HasAnyFunctionTable() const { return !module_tables_.empty(); }
+@@ -120,6 +121,7 @@ class FunctionDispatcher : public IModuleRegistrar {
+     uint32_t code_size;
+     uint32_t image_base;
+     uint32_t image_size;
++    uint32_t table_base;
+     uint32_t next_thunk_address;
+     uint32_t thunk_limit;
+   };
+diff --git a/include/rex/system/xmemory.h b/include/rex/system/xmemory.h
+index 0c39a42..c416885 100644
+--- a/include/rex/system/xmemory.h
++++ b/include/rex/system/xmemory.h
+@@ -551,7 +551,7 @@ class Memory {
+   // (guest_addr - code_base) * 2. Internally locked: callers may invoke from
+   // any thread.
+   bool InitializeFunctionTable(uint32_t code_base, uint32_t code_size, uint32_t image_base,
+-                               uint32_t image_size);
++                               uint32_t image_size, uint32_t table_base = 0);
+   bool DestroyFunctionTable(uint32_t code_base);
+   // Returns false if guest_address is outside every registered module range.
+   bool SetFunction(uint32_t guest_address, PPCFunc* host_function);
+diff --git a/resources/templates/codegen/_indirect_call.inja b/resources/templates/codegen/_indirect_call.inja
+index d4b1830..fc58d31 100644
+--- a/resources/templates/codegen/_indirect_call.inja
++++ b/resources/templates/codegen/_indirect_call.inja
+@@ -2,7 +2,7 @@
+ // Indirect Call Dispatch
+ //
+ // REX_LOOKUP_FUNC indexes into the per-module dispatch table at
+-// IMAGE_BASE + IMAGE_SIZE. REX_CALL_INDIRECT_FUNC bounds-checks the target
++// REX_FUNC_TABLE_BASE (by default IMAGE_BASE + IMAGE_SIZE). REX_CALL_INDIRECT_FUNC bounds-checks the target
+ // against the caller's [REX_CODE_BASE, REX_CODE_BASE + REX_CODE_SIZE +
+ // REX_THUNK_RESERVE_SIZE) range; out-of-bounds targets and in-bounds
+ // unregistered slots fall back to rex::runtime::ResolveIndirectFunction,
+@@ -17,7 +17,7 @@
+ #endif
+ 
+ #define REX_LOOKUP_FUNC(x, y) \
+-  (*(PPCFunc**)(x + REX_IMAGE_BASE + REX_IMAGE_SIZE + (u64(u32(y) - REX_CODE_BASE) * 2)))
++  (*(PPCFunc**)(x + REX_FUNC_TABLE_BASE + (u64(u32(y) - REX_CODE_BASE) * 2)))
+ 
+ #define REX_CALL_INDIRECT_FUNC(x)                                                          \
+   do {                                                                                     \
+diff --git a/resources/templates/codegen/init_cpp.inja b/resources/templates/codegen/init_cpp.inja
+index 1be4759..4e53164 100644
+--- a/resources/templates/codegen/init_cpp.inja
++++ b/resources/templates/codegen/init_cpp.inja
+@@ -27,6 +27,7 @@ const rex::PPCImageInfo PPCImageConfig = {
+         .non_argument_as_local = {{ config_flags.non_argument_as_local }},
+         .non_volatile_as_local = {{ config_flags.non_volatile_as_local }},
+     },
++    .function_table_base = REX_FUNC_TABLE_BASE,
+ };
+ 
+ PPCFuncMapping PPCFuncMappings[] = {
+diff --git a/resources/templates/codegen/pch_h.inja b/resources/templates/codegen/pch_h.inja
+index 68274d2..ce99857 100644
+--- a/resources/templates/codegen/pch_h.inja
++++ b/resources/templates/codegen/pch_h.inja
+@@ -19,6 +19,7 @@
+ {% endif %}
+ #define REX_IMAGE_BASE {{ image_base }}ull
+ #define REX_IMAGE_SIZE {{ image_size }}ull
++#define REX_FUNC_TABLE_BASE {{ function_table_base }}ull
+ #define REX_CODE_BASE {{ code_base }}ull
+ #define REX_CODE_SIZE {{ code_size }}ull
+ #define REX_THUNK_RESERVE_SIZE {{ thunk_reserve_size }}ull
+diff --git a/resources/templates/test/ppc_config_h.inja b/resources/templates/test/ppc_config_h.inja
+index 0c334f8..2f3ddf9 100644
+--- a/resources/templates/test/ppc_config_h.inja
++++ b/resources/templates/test/ppc_config_h.inja
+@@ -25,6 +25,7 @@
+ // Test code base address (matches -Ttext=0x82010000 linker option)
+ #define REX_IMAGE_BASE 0x{{ image_base }}ull
+ #define REX_IMAGE_SIZE 0x{{ image_size }}ull
++#define REX_FUNC_TABLE_BASE (REX_IMAGE_BASE + REX_IMAGE_SIZE)
+ #define REX_CODE_BASE 0x{{ code_base }}ull
+ #define REX_CODE_SIZE 0x{{ code_size }}ull
+ #define REX_THUNK_RESERVE_SIZE 0x10000ull
+diff --git a/src/codegen/codegen_writer.cpp b/src/codegen/codegen_writer.cpp
+index a0484fb..03306fd 100644
+--- a/src/codegen/codegen_writer.cpp
++++ b/src/codegen/codegen_writer.cpp
+@@ -95,6 +95,10 @@ nlohmann::json buildTemplateData(const rex::codegen::CodegenContext& ctx,
+       {"project", cfg.projectName},
+       {"image_base", fmt::format("0x{:X}", ctx.binary().baseAddress())},
+       {"image_size", fmt::format("0x{:X}", ctx.binary().imageSize())},
++      {"function_table_base",
++       fmt::format("0x{:X}", cfg.functionTableBase
++                                 ? cfg.functionTableBase
++                                 : uint32_t(ctx.binary().baseAddress() + ctx.binary().imageSize()))},
+       {"code_base", fmt::format("0x{:X}", codeMin)},
+       {"code_size", fmt::format("0x{:X}", codeMax - codeMin)},
+       {"rexcrt_heap", cfg.rexcrtFunctions.contains("RtlAllocateHeap") ? 1 : 0},
+diff --git a/src/codegen/config.cpp b/src/codegen/config.cpp
+index 5da54a0..1c92945 100644
+--- a/src/codegen/config.cpp
++++ b/src/codegen/config.cpp
+@@ -129,6 +129,10 @@ void ApplyToml(const toml::table& toml, RecompilerConfig& cfg, const std::string
+     uint32_t addr = static_cast<uint32_t>(*v);
+     MergeScalar(cfg.setJmpAddress, addr, "setjmp_address");
+   }
++  if (auto v = toml["function_table_base"].value<int64_t>()) {
++    uint32_t addr = static_cast<uint32_t>(*v);
++    MergeScalar(cfg.functionTableBase, addr, "function_table_base");
++  }
+ 
+   // --- [analysis] section scalars ---
+   if (auto* analysisTable = toml["analysis"].as_table()) {
+diff --git a/src/system/function_dispatcher.cpp b/src/system/function_dispatcher.cpp
+index bd43109..1516511 100644
+--- a/src/system/function_dispatcher.cpp
++++ b/src/system/function_dispatcher.cpp
+@@ -181,7 +181,7 @@ uint64_t FunctionDispatcher::ExecuteInterrupt(ThreadState* thread_state, uint32_
+ 
+ bool FunctionDispatcher::InitializeFunctionTable(uint32_t code_base, uint32_t code_size,
+                                                  uint32_t image_base, uint32_t image_size,
+-                                                 bool is_entrypoint) {
++                                                 bool is_entrypoint, uint32_t table_base) {
+   std::lock_guard<std::recursive_mutex> lock(dispatch_mutex_);
+ 
+   if (is_entrypoint && entrypoint_code_base_ != 0) {
+@@ -190,15 +190,28 @@ bool FunctionDispatcher::InitializeFunctionTable(uint32_t code_base, uint32_t co
+     return false;
+   }
+ 
+-  uint32_t new_table_end = image_base + image_size + (code_size + kThunkReserveSize) * 2;
++  if (!table_base) table_base = image_base + image_size;
++  uint32_t new_table_end = table_base + (code_size + kThunkReserveSize) * 2;
++  uint32_t new_image_end = image_base + image_size;
+   uint32_t new_code_end = code_base + code_size + kThunkReserveSize;
++  auto overlaps = [](uint32_t a0, uint32_t a1, uint32_t b0, uint32_t b1) {
++    return a0 < b1 && b0 < a1;
++  };
+   for (const auto& existing : module_tables_) {
+     uint32_t existing_table_end =
+-        existing.image_base + existing.image_size + (existing.code_size + kThunkReserveSize) * 2;
++        existing.table_base + (existing.code_size + kThunkReserveSize) * 2;
++    uint32_t existing_image_end = existing.image_base + existing.image_size;
+     uint32_t existing_code_end = existing.code_base + existing.code_size + kThunkReserveSize;
+-    if (image_base < existing_table_end && new_table_end > existing.image_base) {
+-      REXLOG_ERROR("Module image range [{:08X}, {:08X}) overlaps existing [{:08X}, {:08X})",
+-                   image_base, new_table_end, existing.image_base, existing_table_end);
++    // Images and dispatch tables must not overlap each other in any combination.
++    if (overlaps(image_base, new_image_end, existing.image_base, existing_image_end) ||
++        overlaps(image_base, new_image_end, existing.table_base, existing_table_end) ||
++        overlaps(table_base, new_table_end, existing.image_base, existing_image_end) ||
++        overlaps(table_base, new_table_end, existing.table_base, existing_table_end)) {
++      REXLOG_ERROR(
++          "Module image [{:08X}, {:08X}) / table [{:08X}, {:08X}) overlaps existing "
++          "image [{:08X}, {:08X}) / table [{:08X}, {:08X}); set function_table_base",
++          image_base, new_image_end, table_base, new_table_end, existing.image_base,
++          existing_image_end, existing.table_base, existing_table_end);
+       return false;
+     }
+     if (code_base < existing_code_end && new_code_end > existing.code_base) {
+@@ -208,7 +221,8 @@ bool FunctionDispatcher::InitializeFunctionTable(uint32_t code_base, uint32_t co
+     }
+   }
+ 
+-  if (!memory_->InitializeFunctionTable(code_base, code_size, image_base, image_size)) {
++  if (!memory_->InitializeFunctionTable(code_base, code_size, image_base, image_size,
++                                        table_base)) {
+     REXLOG_ERROR("Failed to initialize guest memory function table");
+     return false;
+   }
+@@ -218,6 +232,7 @@ bool FunctionDispatcher::InitializeFunctionTable(uint32_t code_base, uint32_t co
+       .code_size = code_size,
+       .image_base = image_base,
+       .image_size = image_size,
++      .table_base = table_base,
+       .next_thunk_address = code_base + code_size,
+       .thunk_limit = code_base + code_size + kThunkReserveSize,
+   });
+diff --git a/src/system/runtime.cpp b/src/system/runtime.cpp
+index c10694c..8b27425 100644
+--- a/src/system/runtime.cpp
++++ b/src/system/runtime.cpp
+@@ -207,7 +207,8 @@ X_STATUS Runtime::Setup(const rex::PPCImageInfo& image_info, RuntimeConfig confi
+ 
+   if (!function_dispatcher_->InitializeFunctionTable(image_info.code_base, image_info.code_size,
+                                                      image_info.image_base, image_info.image_size,
+-                                                     /*is_entrypoint=*/true)) {
++                                                     /*is_entrypoint=*/true,
++                                                     image_info.function_table_base)) {
+     REXSYS_ERROR("Failed to initialize function table");
+     Shutdown();
+     return X_STATUS_UNSUCCESSFUL;
+diff --git a/src/system/xmemory.cpp b/src/system/xmemory.cpp
+index 76cc877..1b3dc73 100644
+--- a/src/system/xmemory.cpp
++++ b/src/system/xmemory.cpp
+@@ -785,9 +785,9 @@ bool Memory::Restore(stream::ByteStream* stream) {
+ //=============================================================================
+ 
+ bool Memory::InitializeFunctionTable(uint32_t code_base, uint32_t code_size, uint32_t image_base,
+-                                     uint32_t image_size) {
++                                     uint32_t image_size, uint32_t table_base) {
+   constexpr uint32_t kThunkReserveSize = runtime::FunctionDispatcher::kThunkReserveSize;
+-  uint32_t table_base = image_base + image_size;
++  if (!table_base) table_base = image_base + image_size;
+   uint32_t table_size = (code_size + kThunkReserveSize) * 2;
+ 
+   REXSYS_DEBUG(

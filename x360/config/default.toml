@@ -1,0 +1,14 @@
+# Analysis overrides for default.xex.
+
+# default.xex sits at 0x82000000 and the game module (fifadllzf.xex) is mapped at
+# 0x82300000. The dispatch table would normally start right after default.xex's image
+# (0x821F0000) and run into the module, so it goes after the module's own table.
+function_table_base = 0x86100000
+
+# Entries under the "autofix" marker are maintained by tools/autofix_codegen.py:
+# function starts the analyser missed because they are only reached by a tail jump
+# (mostly this-adjust thunks: `addi r3,r3,N; b target`). The analyser works out the
+# bounds from each seed.
+[functions]
+# --- autofix ---
+0x8211A170 = { name = "sub_8211A170" }

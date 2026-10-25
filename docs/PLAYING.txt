@@ -1,0 +1,49 @@
+2010 FIFA World Cup South Africa: Recompiled
+============================================
+
+An unofficial native PC port of the Xbox 360 game. No game files are included:
+you need your own Xbox 360 copy of the game (Europe disc, En/Es/Nl).
+
+Getting started
+---------------
+1. Run Launcher.exe.
+2. Click "Disc image (.iso)" and pick your Xbox 360 disc image
+   (or "Folder" for a folder that holds default.xex and fifadllzf.xex).
+   The launcher checks that it is the right version.
+3. Choose your settings and press PLAY.
+
+Settings
+--------
+Render resolution  720p is the original. 1440p (2x) and 4K (3x) render the game
+                   at a higher resolution for a sharper picture.
+Texture filtering  Anisotropic filtering keeps the pitch and stands sharp at an angle.
+Controls           Controller (Xbox / any XInput pad) or Keyboard.
+V-Sync             On by default.
+
+Keyboard controls (when Controls = Keyboard)
+--------------------------------------------
+Move           W A S D
+A / B / X / Y  Space / Backspace / L / P
+LB / RB        1 / 3
+LT / RT        Q / E
+Right stick    Arrow keys
+D-pad          Shift + Arrow keys
+Start / Back   Enter / Tab
+
+Other keys
+----------
+F3       performance overlay
+Alt+F4   quit
+
+Files
+-----
+Settings, saves, logs and the shader cache go to
+%LOCALAPPDATA%\FIFA World Cup 2010 Recompiled
+(create an empty portable.txt next to Launcher.exe to keep them in a "userdata"
+folder here instead). "Saves and logs folder" in the launcher opens it.
+
+Requirements
+------------
+Windows 10 or 11 (64-bit), a Direct3D 12 graphics card with current drivers.
+
+This is a fan project, not affiliated with or endorsed by EA, FIFA or Microsoft.

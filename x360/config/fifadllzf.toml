@@ -1,0 +1,27 @@
+# Analysis overrides for fifadllzf.xex (the game module).
+# Entries under the "autofix" marker are maintained by tools/autofix_codegen.py:
+# function starts the analyser missed because they are only reached by a tail jump.
+# The analyser works out the bounds from each seed.
+
+# The CRT's setjmp/longjmp, used by Lua's error handling (luaD_rawrunprotected /
+# luaD_throw) and a few other error paths. Without these, a longjmp returns to the
+# wrong place and the game carries on down the error path (skipping init steps).
+# Found with tools/find_setjmp.py and checked by hand.
+setjmp_address = 0x8283C680
+longjmp_address = 0x8283C950
+
+[functions]
+# --- autofix ---
+0x82A63768 = { name = "sub_82A63768" }
+0x82A63A08 = { name = "sub_82A63A08" }
+0x82ADF698 = { name = "sub_82ADF698" }
+0x82ADF6B0 = { name = "sub_82ADF6B0" }
+0x82BCBDB8 = { name = "sub_82BCBDB8" }
+0x82DA6148 = { name = "sub_82DA6148" }
+0x831A11B8 = { name = "sub_831A11B8" }
+0x8323FB38 = { name = "sub_8323FB38" }
+0x83703558 = { name = "sub_83703558" }
+0x837045C0 = { name = "sub_837045C0" }
+0x83704A30 = { name = "sub_83704A30" }
+0x8375B9D0 = { name = "sub_8375B9D0" }
+0x82AADB28 = { name = "sub_82AADB28" }

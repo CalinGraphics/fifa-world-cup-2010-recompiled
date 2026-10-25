@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>Launcher</AssemblyName>
+    <RootNamespace>Fifawc10Launcher</RootNamespace>
+    <Version>0.1.0</Version>
+    <Product>2010 FIFA World Cup South Africa: Recompiled</Product>
+    <AssemblyTitle>2010 FIFA World Cup South Africa: Recompiled - Launcher</AssemblyTitle>
+    <Company>Miertescu Stefan-Calin</Company>
+    <Copyright>Copyright (c) 2026 Miertescu Stefan-Calin</Copyright>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
+    <!-- One self-contained Launcher.exe: nothing to install on the player's PC. -->
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="icon.ico" />
+  </ItemGroup>
+
+</Project>
