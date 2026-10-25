@@ -1,0 +1,95 @@
+diff --git a/include/rex/kernel/xboxkrnl/video.h b/include/rex/kernel/xboxkrnl/video.h
+index 0b9bd41..90a1f5c 100644
+--- a/include/rex/kernel/xboxkrnl/video.h
++++ b/include/rex/kernel/xboxkrnl/video.h
+@@ -26,6 +26,9 @@ namespace rex::kernel::xboxkrnl {
+ 
+ void VdQueryVideoMode(system::X_VIDEO_MODE* video_mode);
+ 
++// Frames the guest has presented (VdSwap calls) since start. Any thread.
++uint64_t VdSwapCount();
++
+ // Register video variable exports (VdGlobalDevice, VdHSIOCalibrationLock, etc.)
+ // Must be called during kernel initialization before XEX modules are loaded.
+ void RegisterVideoExports(rex::runtime::ExportResolver* export_resolver,
+diff --git a/src/kernel/xboxkrnl/xboxkrnl_video.cpp b/src/kernel/xboxkrnl/xboxkrnl_video.cpp
+index 642f7ff..f1bb3a7 100644
+--- a/src/kernel/xboxkrnl/xboxkrnl_video.cpp
++++ b/src/kernel/xboxkrnl/xboxkrnl_video.cpp
+@@ -14,7 +14,9 @@
+ 
+ #include <algorithm>
+ #include <atomic>
++#include <chrono>
+ #include <string>
++#include <thread>
+ 
+ #include <rex/cvar.h>
+ #include <rex/graphics/pipeline/texture/info.h>
+@@ -33,7 +35,45 @@
+ #include <rex/system/xtypes.h>
+ #include <rex/ui/flags.h>
+ 
++REXCVAR_DEFINE_INT32(frame_rate_limit, 0, "GPU",
++                     "Most frames per second the guest may present (0: no limit, the game's own "
++                     "pacing). The guest waits in VdSwap when it presents sooner.")
++    .range(0, 240);
++
+ namespace {
++std::atomic<uint64_t> vd_swap_count{0};
++
++// Holds the presenting guest thread so frames are at least 1/frame_rate_limit apart.
++// Keeps the cadence from frame to frame; after a stall (loading) it starts over.
++void LimitFrameRate() {
++  int32_t limit = REXCVAR_GET(frame_rate_limit);
++  if (limit <= 0) {
++    return;
++  }
++  using clock = std::chrono::steady_clock;
++  static clock::time_point last{};
++  const auto period = std::chrono::nanoseconds(1000000000LL / limit);
++  auto now = clock::now();
++  if (last == clock::time_point{} || now - last > period * 4) {
++    last = now;
++    return;
++  }
++  auto target = last + period;
++  if (now < target) {
++    // Sleep most of the way, then yield-spin: Sleep alone overshoots by up to a timer tick.
++    auto coarse = target - std::chrono::microseconds(1500);
++    if (now < coarse) {
++      std::this_thread::sleep_until(coarse);
++    }
++    while (clock::now() < target) {
++      std::this_thread::yield();
++    }
++    last = target;
++  } else {
++    last = (now - target > period) ? now : target;
++  }
++}
++
+ // Display gamma type: 0 - linear, 1 - sRGB (CRT), 2 - BT.709 (HDTV), 3 - power
+ constexpr uint32_t kDisplayGammaType = 2;
+ // Display gamma power (used with gamma type 3)
+@@ -205,6 +245,10 @@ void VdGetCurrentDisplayInformation_entry(ppc_ptr_t<X_DISPLAY_INFO> display_info
+   display_info->actual_display_width = (uint16_t)mode.display_width;
+ }
+ 
++uint64_t VdSwapCount() {
++  return vd_swap_count.load(std::memory_order_relaxed);
++}
++
+ void VdQueryVideoMode(X_VIDEO_MODE* video_mode) {
+   // Exposed as CVARs so the guest can observe custom display settings.
+   uint32_t display_width = 0;
+@@ -431,6 +475,9 @@ void VdSwap_entry(mapped_void buffer_ptr,      // ptr into primary ringbuffer
+   assert(width);
+   assert(height);
+ 
++  LimitFrameRate();
++  vd_swap_count.fetch_add(1, std::memory_order_relaxed);
++
+   namespace xenos = rex::graphics::xenos;
+ 
+   xenos::xe_gpu_texture_fetch_t gpu_fetch;

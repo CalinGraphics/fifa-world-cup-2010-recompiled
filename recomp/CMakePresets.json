@@ -1,0 +1,39 @@
+{
+    "version": 6,
+    "cmakeMinimumRequired": { "major": 3, "minor": 25, "patch": 0 },
+    "configurePresets": [
+        {
+            "name": "windows-base",
+            "hidden": true,
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/../out/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "clang",
+                "CMAKE_CXX_COMPILER": "clang++"
+            }
+        },
+        {
+            "name": "win-amd64-release",
+            "displayName": "Windows x64 Release",
+            "inherits": "windows-base",
+            "cacheVariables": { "CMAKE_BUILD_TYPE": "Release" }
+        },
+        {
+            "name": "win-amd64-relwithdebinfo",
+            "displayName": "Windows x64 RelWithDebInfo",
+            "inherits": "windows-base",
+            "cacheVariables": { "CMAKE_BUILD_TYPE": "RelWithDebInfo" }
+        },
+        {
+            "name": "win-amd64-debug",
+            "displayName": "Windows x64 Debug",
+            "inherits": "windows-base",
+            "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
+        }
+    ],
+    "buildPresets": [
+        { "name": "win-amd64-release", "configurePreset": "win-amd64-release" },
+        { "name": "win-amd64-relwithdebinfo", "configurePreset": "win-amd64-relwithdebinfo" },
+        { "name": "win-amd64-debug", "configurePreset": "win-amd64-debug" }
+    ]
+}

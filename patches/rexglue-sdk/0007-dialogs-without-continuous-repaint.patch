@@ -1,0 +1,36 @@
+diff --git a/include/rex/ui/imgui_dialog.h b/include/rex/ui/imgui_dialog.h
+index a7ab6b3..a48bb9d 100644
+--- a/include/rex/ui/imgui_dialog.h
++++ b/include/rex/ui/imgui_dialog.h
+@@ -39,6 +39,11 @@ class ImGuiDialog {
+ 
+   void Draw();
+ 
++  // Whether the window should be repainted continuously while this dialog exists.
++  // A dialog that only changes with the guest's frames (drawn with each of them anyway)
++  // returns false, so the UI isn't repainted at the display's full refresh rate for it.
++  virtual bool WantsContinuousPaint() const { return true; }
++
+  protected:
+   ImGuiDialog(ImGuiDrawer* imgui_drawer);
+ 
+diff --git a/src/ui/imgui_drawer.cpp b/src/ui/imgui_drawer.cpp
+index f270f3c..98f17a4 100644
+--- a/src/ui/imgui_drawer.cpp
++++ b/src/ui/imgui_drawer.cpp
+@@ -439,7 +439,14 @@ void ImGuiDrawer::Draw(UIDrawContext& ui_draw_context) {
+   if (!dialogs_.empty()) {
+     // Repaint (and handle input) continuously if still active. In detached mode
+     // there is no presenter; the app drives repaint via its own present loop.
+-    if (presenter_) {
++    bool continuous = false;
++    for (const ImGuiDialog* dialog : dialogs_) {
++      if (dialog->WantsContinuousPaint()) {
++        continuous = true;
++        break;
++      }
++    }
++    if (presenter_ && continuous) {
+       presenter_->RequestUIPaintFromUIThread();
+     }
+   }

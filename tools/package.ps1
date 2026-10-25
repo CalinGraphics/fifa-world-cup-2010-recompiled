@@ -1,6 +1,6 @@
 # Puts the built game, the launcher and the runtime files in one folder and zips it.
 #
-#   powershell -ExecutionPolicy Bypass -File tools\build\package.ps1 [-Sdk ..\rexglue-sdk] [-Config release]
+#   powershell -ExecutionPolicy Bypass -File tools\package.ps1 [-Config release]   (or: build.ps1 -Package)
 #
 # Output: out\package\FIFA World Cup 2010 Recompiled\ and out\FIFA-World-Cup-2010-Recompiled-<version>-win-x64.zip
 # The package holds no game files: players point the launcher at their own disc image.
@@ -9,10 +9,10 @@ param(
   [string]$Config = "release"
 )
 $ErrorActionPreference = "Stop"
-if (-not $Sdk) { $Sdk = Join-Path (Split-Path (Split-Path (Split-Path $PSScriptRoot))) "rexglue-sdk" }
-$repo = Split-Path (Split-Path $PSScriptRoot)
+if (-not $Sdk) { $Sdk = Join-Path (Split-Path $PSScriptRoot) "rexglue-sdk" }
+$repo = Split-Path $PSScriptRoot
 $version = (Get-Content (Join-Path $repo "VERSION")).Trim()
-$bin = Join-Path $repo "x360\out\build\win-amd64-$Config"
+$bin = Join-Path $repo "out\build\win-amd64-$Config"
 $outRoot = Join-Path $repo "out"
 $pkg = Join-Path $outRoot "package\FIFA World Cup 2010 Recompiled"
 Remove-Item $pkg -Recurse -Force -ErrorAction SilentlyContinue

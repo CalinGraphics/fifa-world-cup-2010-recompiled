@@ -103,6 +103,8 @@ public partial class MainWindow : Window
         foreach (ComboBoxItem item in WindowBox.Items)
             if ((string)item.Tag == $"{settings.WindowWidth}x{settings.WindowHeight}") WindowBox.SelectedItem = item;
         VSyncBox.IsChecked = settings.VSync;
+        (settings.FrameRateLimit == 30 ? Fps30 : Fps60).IsChecked = true;
+        ShowFpsBox.IsChecked = settings.ShowFps;
         (settings.RenderScale switch { 1 => Scale1, 3 => Scale3, _ => Scale2 }).IsChecked = true;
         (settings.Anisotropic switch { -1 => AnisoOff, 3 => Aniso4, 4 => Aniso8, _ => Aniso16 }).IsChecked = true;
         (settings.Controls == "Keyboard" ? CtlKeys : CtlPad).IsChecked = true;
@@ -118,6 +120,8 @@ public partial class MainWindow : Window
             settings.WindowHeight = int.Parse(p[1]);
         }
         settings.VSync = VSyncBox.IsChecked == true;
+        settings.FrameRateLimit = Fps30.IsChecked == true ? 30 : 60;
+        settings.ShowFps = ShowFpsBox.IsChecked == true;
         settings.RenderScale = Scale1.IsChecked == true ? 1 : Scale3.IsChecked == true ? 3 : 2;
         settings.Anisotropic = AnisoOff.IsChecked == true ? -1 : Aniso4.IsChecked == true ? 3 : Aniso8.IsChecked == true ? 4 : 5;
         settings.Controls = CtlKeys.IsChecked == true ? "Keyboard" : "Controller";
@@ -146,7 +150,8 @@ public partial class MainWindow : Window
             _ => "BORDERLESS",
         };
         SumCtl.Text = settings.Controls == "Keyboard" ? "KEYBOARD" : "CONTROLLER";
-        SumFps.Text = settings.VSync ? "60  ·  V-SYNC" : "60  ·  NO V-SYNC";
+        SumFps.Text = (settings.FrameRateLimit == 30 ? "30" : "60") + (settings.VSync ? "  ·  V-SYNC" : "  ·  NO V-SYNC")
+                      + (settings.ShowFps ? "  ·  COUNTER" : "");
         CtlHint.Text = settings.Controls == "Keyboard"
             ? "The keyboard plays as a controller. The keys:"
             : "Xbox, PlayStation and most other gamepads. Connect it before Kick off. Keyboard keys, if you need them:";

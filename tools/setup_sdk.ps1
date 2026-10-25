@@ -1,6 +1,6 @@
 # Gets the ReXGlue SDK ready for this project: clone, pin, apply patches, build, install.
 #
-#   powershell -ExecutionPolicy Bypass -File tools\build\setup_sdk.ps1 [-Sdk ..\rexglue-sdk]
+#   powershell -ExecutionPolicy Bypass -File tools\setup_sdk.ps1 [-Sdk <folder>]   (build.ps1 runs it for you)
 #
 # Needs git, Visual Studio (C++ workload), LLVM in "C:\Program Files\LLVM" and Python.
 param(
@@ -8,8 +8,8 @@ param(
   [string]$Commit = "bd833a2"
 )
 $ErrorActionPreference = "Stop"
-if (-not $Sdk) { $Sdk = Join-Path (Split-Path (Split-Path (Split-Path $PSScriptRoot))) "rexglue-sdk" }
-$repo = Split-Path (Split-Path $PSScriptRoot)
+if (-not $Sdk) { $Sdk = Join-Path (Split-Path $PSScriptRoot) "rexglue-sdk" }
+$repo = Split-Path $PSScriptRoot
 
 if (-not (Test-Path $Sdk)) {
   git clone -c core.autocrlf=false -c core.symlinks=true https://github.com/rexglue/rexglue-sdk $Sdk
@@ -38,7 +38,7 @@ try {
     "cmake --build out/build/win-amd64 --config Release --target install || exit /b 1"
   ) -join "`r`n")
   # Run through a .cmd file: cmd /c mangles the nested quotes of a one-line command.
-  $bat = Join-Path $env:TEMP "fifawc10-build-$PID.cmd"
+  $bat = Join-Path $env:TEMP "fifawc10-sdk-$PID.cmd"
   Set-Content $bat ("@echo off`r`n" + $cmd) -Encoding ASCII
   cmd /c "`"$bat`""
   $code = $LASTEXITCODE

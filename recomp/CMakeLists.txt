@@ -23,6 +23,7 @@ set(FIFAWC10_SOURCES
     src/crash_handler.cpp
     src/data_folder.cpp
     src/debug_watch.cpp
+    src/fps_overlay.cpp
     src/perf_log.cpp
     src/open_launcher.cpp
 )

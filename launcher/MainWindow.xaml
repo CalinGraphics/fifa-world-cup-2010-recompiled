@@ -202,6 +202,30 @@
                               Checked="Setting_Changed" Unchecked="Setting_Changed"/>
                   </Grid>
                 </Border>
+                <Border Style="{StaticResource Row}">
+                  <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <StackPanel Margin="0,0,16,0">
+                      <TextBlock Text="Frame rate" Style="{StaticResource RowName}"/>
+                      <TextBlock Text="60 in matches. Menus and cutscenes run at 30, as on the console." Style="{StaticResource Hint}" TextWrapping="Wrap" Margin="0,3,0,0"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,6,0">
+                      <RadioButton x:Name="Fps60" Content="60" GroupName="fps" Style="{StaticResource Chip}" Checked="Setting_Changed"/>
+                      <RadioButton x:Name="Fps30" Content="30" GroupName="fps" Style="{StaticResource Chip}" Checked="Setting_Changed" Margin="0"/>
+                    </StackPanel>
+                  </Grid>
+                </Border>
+                <Border Style="{StaticResource Row}">
+                  <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <StackPanel Margin="0,0,16,0">
+                      <TextBlock Text="FPS counter" Style="{StaticResource RowName}"/>
+                      <TextBlock Text="Top-right corner. F2 shows or hides it in game." Style="{StaticResource Hint}" Margin="0,3,0,0"/>
+                    </StackPanel>
+                    <CheckBox x:Name="ShowFpsBox" Grid.Column="1" Style="{StaticResource Switch}" VerticalAlignment="Center" Margin="0,0,8,0"
+                              Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                  </Grid>
+                </Border>
                 <Rectangle Height="1" Fill="{StaticResource Hair}"/>
               </StackPanel>
 

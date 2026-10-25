@@ -16,7 +16,8 @@ Getting started
 Launcher pages
 --------------
 Play      Your game copy and a summary of your settings
-Display   Window, borderless or exclusive fullscreen; window size; V-Sync
+Display   Window, borderless or exclusive fullscreen; window size; V-Sync;
+          frame rate (60, or 30 everywhere); FPS counter
 Graphics  Render resolution: 720p (original), 1440p or 4K; texture filtering
 Controls  Controller (Xbox, PlayStation, others) or keyboard
 About     Saves and logs folder, desktop shortcut, reset settings
@@ -34,7 +35,7 @@ Player run / finesse     1 / 3   (LB / RB)
 Skill moves              Arrow keys (right stick)
 D-pad                    Shift + arrow keys
 Pause / Back             Enter / Tab
-Performance overlay      F3
+FPS counter on / off     F2
 
 Alt+F4 quits. The game saves automatically.
 

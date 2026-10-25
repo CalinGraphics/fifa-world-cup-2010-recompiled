@@ -8,7 +8,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>Launcher</AssemblyName>
     <RootNamespace>Fifawc10Launcher</RootNamespace>
-    <Version>0.2.0</Version>
+    <Version>0.3.0</Version>
     <Product>2010 FIFA World Cup South Africa: Recompiled</Product>
     <AssemblyTitle>2010 FIFA World Cup South Africa: Recompiled - Launcher</AssemblyTitle>
     <Company>Miertescu Stefan-Calin</Company>

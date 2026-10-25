@@ -9,11 +9,14 @@
 #include <rex/filesystem/vfs.h>
 #include <rex/rex_app.h>
 #include <rex/runtime.h>
+#include <rex/ui/keybinds.h>
+#include <rex/ui/overlay/achievement_notification.h>
 #include <rex/ui/window.h>
 
 #include "crash_handler.h"
 #include "data_folder.h"
 #include "debug_watch.h"
+#include "fps_overlay.h"
 #include "open_launcher.h"
 #include "perf_log.h"
 
@@ -57,6 +60,49 @@ class Fifawc10App : public rex::ReXApp {
     if (config.gpu_plugin.empty()) config.gpu_plugin = "xenos";
   }
 
+  // GPU settings this game needs, unless the config file or command line sets them.
+  // Applied once the renderer is loaded (its settings don't exist before) and before
+  // the game starts drawing.
+  static void ApplyGameGpuDefaults() {
+    // The game draws full-screen rectangles (stencil and clear passes) with clipping off.
+    // The renderer then guesses their size from the scissor, which can claim the whole
+    // render target memory and wipe what the game drew earlier: the screen went black
+    // for seconds at a time in Training Ground. Running those few vertex shaders on the
+    // CPU gives their real size.
+    if (!rex::cvar::HasNonDefaultValue("execute_unclipped_draw_vs_on_cpu")) {
+      rex::cvar::SetFlagByName("execute_unclipped_draw_vs_on_cpu", "true");
+    }
+    // Many of its textures are bound with fetch constants typed "invalid" (type 0), which
+    // the console samples like any texture. Without this they come out black, and each one
+    // logs a warning (over a thousand a second in places).
+    if (!rex::cvar::HasNonDefaultValue("gpu_allow_invalid_fetch_constants")) {
+      rex::cvar::SetFlagByName("gpu_allow_invalid_fetch_constants", "true");
+    }
+  }
+
+  void OnCreateDialogs(rex::ui::ImGuiDrawer* drawer) override {
+    if (REXCVAR_GET(show_fps)) fps_overlay_ = std::make_unique<fifawc10::FpsOverlay>(drawer);
+    rex::ui::RegisterBind("bind_fps_counter", "F2", "Show or hide the frame counter", [this] {
+      if (fps_overlay_) {
+        fps_overlay_.reset();
+      } else if (auto* d = imgui_drawer()) {
+        fps_overlay_ = std::make_unique<fifawc10::FpsOverlay>(d);
+      }
+    });
+  }
+
+  void OnShutdown() override {
+    rex::ui::UnregisterBind("bind_fps_counter");
+    fps_overlay_.reset();
+  }
+
+  // The game has no achievement toasts to show here. Without this dialog nothing keeps
+  // the window repainting at the display's full refresh rate between the game's frames.
+  std::unique_ptr<rex::ui::AchievementNotificationDialog> CreateAchievementNotificationDialog()
+      override {
+    return nullptr;
+  }
+
   void OnPostSetup() override {
     if (auto* w = window()) w->SetTitle("2010 FIFA World Cup South Africa: Recompiled");
     // default.xex loads the game module by a bare name ("fifadllzf.xex"). The console
@@ -66,5 +112,13 @@ class Fifawc10App : public rex::ReXApp {
     }
     fifawc10::StartDebugWatch();
     fifawc10::StartPerfLog();
+    ApplyGameGpuDefaults();
+    REXLOG_INFO("fifawc10: unclipped draws on CPU={}, invalid fetch constants={}, frame limit={}",
+                rex::cvar::GetFlagByName("execute_unclipped_draw_vs_on_cpu"),
+                rex::cvar::GetFlagByName("gpu_allow_invalid_fetch_constants"),
+                rex::cvar::GetFlagByName("frame_rate_limit"));
   }
+
+ private:
+  std::unique_ptr<fifawc10::FpsOverlay> fps_overlay_;
 };

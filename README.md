@@ -29,7 +29,7 @@ and compiled for Windows, with a Direct3D 12 renderer. No emulator.
 
 | | |
 |---|---|
-| **Native PC port**, no emulator | **60 fps** in matches, with precise frame pacing |
+| **Native PC port**, no emulator | **60 fps** in matches, or locked to 30, with an optional **FPS counter** |
 | Render at **720p, 1440p or 4K** | **Anisotropic filtering** up to 16x |
 | Runs **straight from your disc image** (`.iso`), nothing to extract | **Controller** (Xbox, PlayStation, others) or **keyboard** |
 | **Launcher** that checks your copy and holds every setting | Saves, settings and logs in one folder, or **portable** |
@@ -49,7 +49,7 @@ Quit with **Alt+F4**; the game saves automatically.
 ### The launcher
 
 - **Play**: your game copy and its check, a summary of your settings
-- **Display**: window, borderless or exclusive fullscreen, window size, V-Sync
+- **Display**: window, borderless or exclusive fullscreen, window size, V-Sync, frame rate (60 or 30), FPS counter
 - **Graphics**: render resolution (720p / 1440p / 4K), texture filtering
 - **Controls**: controller or keyboard, with the keyboard layout
 - **About**: saves and logs folder, desktop shortcut, reset settings
@@ -65,7 +65,7 @@ On first start it picks settings for your screen (your monitor's size, 1440p ren
 | Shoot (B) | `Backspace` | Player run / finesse (LB / RB) | `1` / `3` |
 | Lob / cross (X) | `L` | Skill moves (right stick) | Arrow keys |
 | Through ball (Y) | `P` | D-pad | `Shift` + arrows |
-| Pause / Back | `Enter` / `Tab` | Performance overlay | `F3` |
+| Pause / Back | `Enter` / `Tab` | FPS counter on / off | `F2` |
 
 ## Requirements
 
@@ -97,7 +97,7 @@ and the launcher tells you so. The PS3 version is recognised but not supported.
 
 ## Known issues
 
-- Menus and cutscenes run at 30 fps, as on the console; matches run at 60.
+- Menus and cutscenes run at 30 fps, as on the console; matches run at 60. The 30 fps option locks matches to 30 too.
 - Online modes (Xbox Live) don't work.
 - Not every game mode has been played through end to end yet. Reports are welcome.
 
@@ -119,25 +119,24 @@ Building needs your own copy of the game too: the code generator reads its execu
 The full steps are in [BUILDING.md](BUILDING.md). In short:
 
 ```powershell
-tools\build\setup_sdk.ps1
-tools\build\build.ps1 -Game "<your .iso>"
-tools\build\package.ps1
+# your .iso in the repository folder, then:
+powershell -ExecutionPolicy Bypass -File build.ps1 -Package
 ```
 
 ## Repository
 
 | Folder | What it is |
 |---|---|
-| [`x360/`](x360/) | The Windows app (`src/`), the game-module hooks (`src/module/`) and the codegen manifest and analysis overrides (`config/`) |
+| [`build.ps1`](build.ps1) | The whole build: SDK, code generation, game, launcher, release zip |
+| [`recomp/`](recomp/) | The Windows app (`src/`), the game-module hooks (`src/module/`) and the codegen manifest and analysis overrides (`config/`) |
 | [`launcher/`](launcher/) | The launcher (WPF, .NET 10): game check, settings, start |
 | [`patches/rexglue-sdk/`](patches/rexglue-sdk/) | Changes to the ReXGlue SDK, applied on top of a fixed SDK commit |
-| [`tools/build/`](tools/build/) | SDK setup, build and packaging scripts |
+| [`tools/`](tools/) | SDK setup, packaging, disc image reader (`disc.py`) |
 | [`tools/analysis/`](tools/analysis/) | Reverse-engineering helpers used while porting (XEX image, PowerPC disassembly, missed functions) |
 | [`tools/dev/`](tools/dev/) | Automated test runs: start the game, drive the menus, take screenshots |
-| [`tools/disc.py`](tools/disc.py) | Detects and extracts Xbox 360 and PS3 disc images |
 | [`docs/`](docs/) | Player readme and images |
 
-The C++ translated from the game (`x360/generated/`) isn't part of this repository. It's generated on your
+The C++ translated from the game (`recomp/generated/`) isn't part of this repository. It's generated on your
 own PC from your own copy of the game when you build.
 
 ## Credits

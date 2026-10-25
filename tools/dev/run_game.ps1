@@ -1,7 +1,7 @@
 param([int]$Seconds = 40, [string]$LogLevel = "info", [string]$Config = "release", [string[]]$Extra = @(), [switch]$Keep, [string]$Game = "")
 # Starts fifawc10.exe from a build (release, relwithdebinfo) or the package, logging to out\dev\run.log.
 . "$PSScriptRoot\_paths.ps1"
-$bin = if ($Config -eq "package") { Join-Path $Repo "out\package\FIFA World Cup 2010 Recompiled" } else { Join-Path $Repo "x360\out\build\win-amd64-$Config" }
+$bin = if ($Config -eq "package") { Join-Path $Repo "out\package\FIFA World Cup 2010 Recompiled" } else { Join-Path $Repo "out\build\win-amd64-$Config" }
 if (-not $Game) { $Game = $DefaultGame }
 $log = Join-Path $Work "run.log"
 Get-Process fifawc10 -ErrorAction SilentlyContinue | Stop-Process -Force

@@ -17,6 +17,8 @@ public sealed class Settings
     public bool VSync { get; set; } = true;
     public int Anisotropic { get; set; } = 5;              // -1 original, 3 = 4x, 4 = 8x, 5 = 16x
     public string Controls { get; set; } = "Controller";   // Controller, Keyboard
+    public int FrameRateLimit { get; set; } = 60;          // 60 = the game's own pacing, 30 = locked to 30
+    public bool ShowFps { get; set; } = false;
 
     static readonly JsonSerializerOptions Json = new() { WriteIndented = true };
 
@@ -89,10 +91,17 @@ public sealed class Settings
         sb.AppendLine(string.Create(c, $"window_width = {WindowWidth}"));
         sb.AppendLine(string.Create(c, $"window_height = {WindowHeight}"));
         sb.AppendLine($"vsync = {Bool(VSync)}");
+        sb.AppendLine("# 0: the game's own pacing (60 in matches, 30 in menus and cutscenes)");
+        sb.AppendLine(string.Create(c, $"frame_rate_limit = {(FrameRateLimit >= 60 ? 0 : FrameRateLimit)}"));
+        sb.AppendLine($"show_fps = {Bool(ShowFps)}");
         sb.AppendLine();
         sb.AppendLine("# Graphics: the game renders at 1280x720 times this scale");
         sb.AppendLine(string.Create(c, $"resolution_scale = {RenderScale}"));
         sb.AppendLine(string.Create(c, $"anisotropic_override = {Anisotropic}"));
+        sb.AppendLine("# The game samples textures whose fetch constants say \"invalid\"; without this they render black");
+        sb.AppendLine("gpu_allow_invalid_fetch_constants = true");
+        sb.AppendLine("# Full-screen passes drawn with clipping off get their real size (no black screens)");
+        sb.AppendLine("execute_unclipped_draw_vs_on_cpu = true");
         sb.AppendLine();
         sb.AppendLine("# Input");
         sb.AppendLine($"mnk_mode = {Bool(Controls == "Keyboard")}");
