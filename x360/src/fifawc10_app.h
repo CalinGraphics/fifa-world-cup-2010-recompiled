@@ -30,6 +30,8 @@ class Fifawc10App : public rex::ReXApp {
     // launcher writes, saves and the shader cache. Paths given on the command line win.
     auto data = fifawc10::DataFolder();
     std::error_code ec;
+    // The data folder is also the working folder, so relative paths (logs) land there.
+    std::filesystem::current_path(data, ec);
     paths.config_path = data / "fifawc10.toml";
     // The SDK reads game_data_root before it loads the config file, so a game path
     // that only lives in the config would be missed. Load it early.
@@ -41,6 +43,11 @@ class Fifawc10App : public rex::ReXApp {
     if (REXCVAR_GET(cache_root).empty()) paths.cache_root = data / "cache";
     // No game copy yet: the launcher sets one up.
     fifawc10::OpenLauncherIfNoGame(paths.game_data_root);
+  }
+
+  // Logs next to saves and settings, not next to the exe (which may be in Program Files).
+  void OnConfigureLogging(rex::LogConfig& config) override {
+    config.log_dir = fifawc10::DataFolder() / "logs";
   }
 
   void OnPostInitLogging() override { fifawc10::InstallCrashHandler(); }

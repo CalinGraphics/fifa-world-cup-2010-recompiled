@@ -1,0 +1,33 @@
+// Icon and version information for fifawc10.exe (configured by CMake).
+#include <winver.h>
+
+1 ICON "@FIFAWC10_ICON@"
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION @FIFAWC10_VERSION_MAJOR@,@FIFAWC10_VERSION_MINOR@,@FIFAWC10_VERSION_PATCH@,0
+ PRODUCTVERSION @FIFAWC10_VERSION_MAJOR@,@FIFAWC10_VERSION_MINOR@,@FIFAWC10_VERSION_PATCH@,0
+ FILEFLAGSMASK 0x3fL
+ FILEFLAGS 0x0L
+ FILEOS VOS_NT_WINDOWS32
+ FILETYPE VFT_APP
+ FILESUBTYPE 0x0L
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "040904b0"
+    BEGIN
+      VALUE "CompanyName", "Miertescu Stefan-Calin"
+      VALUE "FileDescription", "2010 FIFA World Cup South Africa: Recompiled"
+      VALUE "FileVersion", "@FIFAWC10_VERSION@"
+      VALUE "InternalName", "fifawc10"
+      VALUE "LegalCopyright", "Port code (c) 2026 Miertescu Stefan-Calin, BSD 3-Clause. Game (c) Electronic Arts."
+      VALUE "OriginalFilename", "fifawc10.exe"
+      VALUE "ProductName", "2010 FIFA World Cup South Africa: Recompiled"
+      VALUE "ProductVersion", "@FIFAWC10_VERSION@"
+    END
+  END
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x409, 1200
+  END
+END

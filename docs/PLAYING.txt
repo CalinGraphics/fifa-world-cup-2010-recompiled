@@ -6,41 +6,44 @@ you need your own Xbox 360 copy of the game (Europe disc, En/Es/Nl).
 
 Getting started
 ---------------
-1. Run Launcher.exe.
-2. Click "Disc image (.iso)" and pick your Xbox 360 disc image
-   (or "Folder" for a folder that holds default.xex and fifadllzf.xex).
+1. Run Launcher.exe. If Windows says "Windows protected your PC", choose
+   More info, then Run anyway (the program isn't code-signed).
+2. Click "Choose disc image" and pick your Xbox 360 disc image, or drop it on the
+   window ("Game folder" works for a folder with default.xex and fifadllzf.xex).
    The launcher checks that it is the right version.
-3. Choose your settings and press PLAY.
+3. Press PLAY.
 
-Settings
+Launcher pages
+--------------
+Play      Your game copy and a summary of your settings
+Display   Window, borderless or exclusive fullscreen; window size; V-Sync
+Graphics  Render resolution: 720p (original), 1440p or 4K; texture filtering
+Controls  Controller (Xbox, PlayStation, others) or keyboard
+About     Saves and logs folder, desktop shortcut, reset settings
+
+Keyboard
 --------
-Render resolution  720p is the original. 1440p (2x) and 4K (3x) render the game
-                   at a higher resolution for a sharper picture.
-Texture filtering  Anisotropic filtering keeps the pitch and stands sharp at an angle.
-Controls           Controller (Xbox / any XInput pad) or Keyboard.
-V-Sync             On by default.
+Move                     W A S D
+Short pass (A)           Space
+Shoot (B)                Backspace
+Lob / cross (X)          L
+Through ball (Y)         P
+Sprint (RT)              E
+Pace control (LT)        Q
+Player run / finesse     1 / 3   (LB / RB)
+Skill moves              Arrow keys (right stick)
+D-pad                    Shift + arrow keys
+Pause / Back             Enter / Tab
+Performance overlay      F3
 
-Keyboard controls (when Controls = Keyboard)
---------------------------------------------
-Move           W A S D
-A / B / X / Y  Space / Backspace / L / P
-LB / RB        1 / 3
-LT / RT        Q / E
-Right stick    Arrow keys
-D-pad          Shift + Arrow keys
-Start / Back   Enter / Tab
-
-Other keys
-----------
-F3       performance overlay
-Alt+F4   quit
+Alt+F4 quits. The game saves automatically.
 
 Files
 -----
 Settings, saves, logs and the shader cache go to
 %LOCALAPPDATA%\FIFA World Cup 2010 Recompiled
-(create an empty portable.txt next to Launcher.exe to keep them in a "userdata"
-folder here instead). "Saves and logs folder" in the launcher opens it.
+Create an empty portable.txt next to Launcher.exe to keep them in a "userdata"
+folder here instead.
 
 Requirements
 ------------

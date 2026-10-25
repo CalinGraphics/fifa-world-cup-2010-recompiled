@@ -1,16 +1,16 @@
 # Draws the project icon (a ball-like badge with "10") and writes launcher\icon.ico
 # with PNG frames at 256, 64, 48, 32 and 16 px.
 Add-Type -AssemblyName System.Drawing
-$out = Join-Path (Split-Path $PSScriptRoot) "launcher\icon.ico"
+$out = Join-Path (Split-Path (Split-Path $PSScriptRoot)) "launcher\icon.ico"
 
 function Frame([int]$n) {
   $b = New-Object Drawing.Bitmap($n, $n)
   $g = [Drawing.Graphics]::FromImage($b)
   $g.SmoothingMode = "AntiAlias"; $g.TextRenderingHint = "AntiAliasGridFit"
   $pad = [math]::Max(1, $n * 0.04)
-  $g.FillEllipse((New-Object Drawing.SolidBrush([Drawing.Color]::FromArgb(255, 232, 103, 42))), $pad, $pad, $n - 2 * $pad, $n - 2 * $pad)
+  $g.FillEllipse((New-Object Drawing.SolidBrush([Drawing.Color]::FromArgb(255, 255, 182, 18))), $pad, $pad, $n - 2 * $pad, $n - 2 * $pad)
   $in = $n * 0.12
-  $g.FillEllipse((New-Object Drawing.SolidBrush([Drawing.Color]::FromArgb(255, 22, 17, 14))), $in, $in, $n - 2 * $in, $n - 2 * $in)
+  $g.FillEllipse((New-Object Drawing.SolidBrush([Drawing.Color]::FromArgb(255, 15, 74, 51))), $in, $in, $n - 2 * $in, $n - 2 * $in)
   $font = New-Object Drawing.Font("Segoe UI", [single]($n * 0.36), [Drawing.FontStyle]::Bold, [Drawing.GraphicsUnit]::Pixel)
   $fmt = New-Object Drawing.StringFormat; $fmt.Alignment = "Center"; $fmt.LineAlignment = "Center"
   $g.DrawString("10", $font, [Drawing.Brushes]::White, (New-Object Drawing.RectangleF(0, ($n * 0.02), $n, $n)), $fmt)

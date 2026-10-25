@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 
@@ -9,15 +10,32 @@ namespace Fifawc10Launcher;
 public sealed class Settings
 {
     public string GamePath { get; set; } = "";
-    public string Display { get; set; } = "Window";      // Window, Borderless, Fullscreen
+    public string Display { get; set; } = "Borderless";    // Window, Borderless, Fullscreen
     public int WindowWidth { get; set; } = 1920;
     public int WindowHeight { get; set; } = 1080;
     public int RenderScale { get; set; } = 2;              // 1 = 720p, 2 = 1440p, 3 = 2160p (4K)
     public bool VSync { get; set; } = true;
-    public int Anisotropic { get; set; } = 5;              // 5 = 16x
+    public int Anisotropic { get; set; } = 5;              // -1 original, 3 = 4x, 4 = 8x, 5 = 16x
     public string Controls { get; set; } = "Controller";   // Controller, Keyboard
 
     static readonly JsonSerializerOptions Json = new() { WriteIndented = true };
+
+    [DllImport("user32.dll")] static extern int GetSystemMetrics(int index);
+
+    /// <summary>Primary monitor size in pixels.</summary>
+    public static (int W, int H) Screen => (Math.Max(1280, GetSystemMetrics(0)), Math.Max(720, GetSystemMetrics(1)));
+
+    /// <summary>Defaults that fit this PC: the monitor's size, and a render scale that matches it.</summary>
+    public static Settings ForThisPc()
+    {
+        var (w, h) = Screen;
+        return new Settings
+        {
+            WindowWidth = w,
+            WindowHeight = h,
+            RenderScale = h >= 2000 ? 3 : 2,
+        };
+    }
 
     /// <summary>Same rule as the game (data_folder.cpp): portable.txt next to the exe keeps everything there.</summary>
     public static string DataFolder
@@ -42,10 +60,10 @@ public sealed class Settings
         try
         {
             if (File.Exists(JsonPath))
-                return JsonSerializer.Deserialize<Settings>(File.ReadAllText(JsonPath)) ?? new Settings();
+                return JsonSerializer.Deserialize<Settings>(File.ReadAllText(JsonPath)) ?? ForThisPc();
         }
         catch { /* a broken file falls back to defaults */ }
-        return new Settings();
+        return ForThisPc();
     }
 
     public void Save()

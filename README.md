@@ -1,72 +1,161 @@
+<div align="center">
+
 # 2010 FIFA World Cup South Africa: Recompiled
 
-An unofficial native PC port of the Xbox 360 game *2010 FIFA World Cup South Africa*.
-The game's PowerPC code is translated to C++ with [ReXGlue](https://github.com/rexglue/rexglue-sdk)
-and compiled into a Windows program with a Direct3D 12 renderer. No emulator.
+<p>
+  <a href="https://github.com/CalinGraphics/fifa-world-cup-2010-recompiled/releases/latest">
+    <img src="https://img.shields.io/badge/Download-latest%20release-FFB612?style=for-the-badge&logo=github&logoColor=black&labelColor=00A86B" alt="Download latest release">
+  </a>
+</p>
 
-![Launcher](docs/images/launcher.png)
+<p>
+  <a href="https://github.com/CalinGraphics/fifa-world-cup-2010-recompiled/releases"><img src="https://img.shields.io/github/downloads/CalinGraphics/fifa-world-cup-2010-recompiled/total?style=flat-square&color=00A86B&label=Downloads" alt="Downloads"></a>
+  <a href="https://github.com/CalinGraphics/fifa-world-cup-2010-recompiled/stargazers"><img src="https://img.shields.io/github/stars/CalinGraphics/fifa-world-cup-2010-recompiled?style=flat-square&color=FFB612&label=Stars" alt="Stars"></a>
+  <a href="https://github.com/CalinGraphics/fifa-world-cup-2010-recompiled/releases/latest"><img src="https://img.shields.io/github/v/release/CalinGraphics/fifa-world-cup-2010-recompiled?style=flat-square&color=1F4FD8&label=Version" alt="Version"></a>
+  <a href="#requirements"><img src="https://img.shields.io/badge/Platform-Windows%2010%2F11-E03C31?style=flat-square" alt="Platform: Windows 10/11"></a>
+</p>
 
-## Status
+An *unofficial* native PC port of the Xbox 360 game **2010 FIFA World Cup South Africa**.
+The game's PowerPC code is statically recompiled into C++ with [ReXGlue](https://github.com/rexglue/rexglue-sdk)
+and compiled for Windows, with a Direct3D 12 renderer. No emulator.
 
-Playable: menus, profile setup, team and kit selection, match intros and full matches.
+**You need your own copy of the game.** No game files are included in this repository or its releases.
 
-- 60 fps in matches (menus and cutscenes run at the game's own 30 fps)
-- Render resolution up to 4K (3x the original 720p)
-- Anisotropic filtering up to 16x
-- Runs straight from your disc image (`.iso`): nothing to extract
-- Controller (XInput) or keyboard
+</div>
 
-Not tested yet: online modes, every game mode end to end, other regions.
-Report problems in [Issues](../../issues) with the log from the launcher's "Saves and logs folder".
+![The launcher](docs/images/launcher.png)
 
-## You need your own copy of the game
+## Highlights
 
-**No game files are included in this repository or its builds, and none ever will be.**
-You need the **Xbox 360** version, dumped from your own disc: Europe, languages En/Es/Nl.
-The launcher checks the copy and tells you if it's a different version.
-
-The PS3 version is detected but not supported yet.
+| | |
+|---|---|
+| **Native PC port**, no emulator | **60 fps** in matches, with precise frame pacing |
+| Render at **720p, 1440p or 4K** | **Anisotropic filtering** up to 16x |
+| Runs **straight from your disc image** (`.iso`), nothing to extract | **Controller** (Xbox, PlayStation, others) or **keyboard** |
+| **Launcher** that checks your copy and holds every setting | Saves, settings and logs in one folder, or **portable** |
 
 ## Playing
 
-1. Build the project (see [BUILDING.md](BUILDING.md)) or use a build you made with `tools\package.ps1`.
-2. Run `Launcher.exe`, click **Disc image (.iso)** and pick your copy.
-3. Choose your settings and press **PLAY**.
+1. Download the latest zip from [Releases](https://github.com/CalinGraphics/fifa-world-cup-2010-recompiled/releases/latest)
+   and extract it anywhere, e.g. `C:\Games\WC2010` (not inside `Program Files`).
+2. Run **`Launcher.exe`**.
+   > The program isn't code-signed, so Windows may show "Windows protected your PC". Choose **More info**, then **Run anyway**.
+3. Click **Choose disc image** and pick your Xbox 360 `.iso` (or drop it on the window).
+   The launcher checks that it's the right version.
+4. Press **PLAY**.
 
-Keyboard controls and other details are in [docs/PLAYING.txt](docs/PLAYING.txt).
+Quit with **Alt+F4**; the game saves automatically.
 
-Requirements: Windows 10 or 11 (64-bit), a Direct3D 12 graphics card.
+### The launcher
 
-## Building
+- **Play**: your game copy and its check, a summary of your settings
+- **Display**: window, borderless or exclusive fullscreen, window size, V-Sync
+- **Graphics**: render resolution (720p / 1440p / 4K), texture filtering
+- **Controls**: controller or keyboard, with the keyboard layout
+- **About**: saves and logs folder, desktop shortcut, reset settings
 
-See [BUILDING.md](BUILDING.md). In short:
+On first start it picks settings for your screen (your monitor's size, 1440p rendering, or 4K on a 4K display).
 
+### Keyboard
+
+| Action | Key | Action | Key |
+|---|---|---|---|
+| Move | `W` `A` `S` `D` | Pace control (LT) | `Q` |
+| Short pass (A) | `Space` | Sprint (RT) | `E` |
+| Shoot (B) | `Backspace` | Player run / finesse (LB / RB) | `1` / `3` |
+| Lob / cross (X) | `L` | Skill moves (right stick) | Arrow keys |
+| Through ball (Y) | `P` | D-pad | `Shift` + arrows |
+| Pause / Back | `Enter` / `Tab` | Performance overlay | `F3` |
+
+## Requirements
+
+The game leans on the graphics card more than the processor. 4K rendering needs a mid-range card or better.
+
+| Requirement | Details |
+|---|---|
+| Windows | 10 or 11, 64-bit |
+| Graphics | Direct3D 12, with up-to-date drivers |
+| Processor | x86-64 with SSE4.2 |
+| The game | Your own *2010 FIFA World Cup South Africa* for **Xbox 360**, as a disc image (`.iso`) or a folder with `default.xex` |
+
+### Which version you need
+
+The port is built from one specific Xbox 360 disc: **Europe (En, Es, Nl)**. Other regions or versions won't run,
+and the launcher tells you so. The PS3 version is recognised but not supported.
+
+| File | SHA-256 |
+|---|---|
+| `default.xex` | `D0DF5465E077EAEBEADDA252C786D9322551AB13EF23AAD461836E510971337D` |
+| `fifadllzf.xex` | `462676F9FBAB83530C2659E79AA43E3DBE81B43DC917DB9299933C19FA34905D` |
+
+### Where things are
+
+| Item | Location |
+|---|---|
+| Saves, settings, logs, shader cache | `%LOCALAPPDATA%\FIFA World Cup 2010 Recompiled` |
+| Portable mode | Create an empty `portable.txt` next to `Launcher.exe`: everything goes to a `userdata` folder there instead |
+
+## Known issues
+
+- Menus and cutscenes run at 30 fps, as on the console; matches run at 60.
+- Online modes (Xbox Live) don't work.
+- Not every game mode has been played through end to end yet. Reports are welcome.
+
+## Troubleshooting
+
+| Problem | Fix |
+|---|---|
+| "This copy is a different version" | You need the Europe Xbox 360 disc (En, Es, Nl); see the hashes above. |
+| The game doesn't start | Update your graphics driver (Direct3D 12 is required). Check the latest log in the saves and logs folder. |
+| Controller not detected | Connect it before pressing Play, and choose **Controller** on the Controls page. |
+| Low frame rate | Lower the render resolution to 1440p or 720p on the Graphics page. |
+
+Problems go in the [Issues](https://github.com/CalinGraphics/fifa-world-cup-2010-recompiled/issues).
+Attach the newest `logs\fifawc10_*.log` (About, **Saves and logs** opens the folder) and the launcher's version.
+
+## Building from source
+
+Building needs your own copy of the game too: the code generator reads its executables.
+The full steps are in [BUILDING.md](BUILDING.md). In short:
+
+```powershell
+tools\build\setup_sdk.ps1
+tools\build\build.ps1 -Game "<your .iso>"
+tools\build\package.ps1
 ```
-tools\setup_sdk.ps1
-tools\build.ps1 -Game "<your .iso>"
-tools\package.ps1
-```
 
-## How it works
+## Repository
 
-- `default.xex` is a small loader; the game itself is the `fifadllzf.xex` module. Both are
-  recompiled; the module becomes `fifawc10_fifadllzf.dll`.
-- `x360/config/` holds what the analyser can't work out alone: functions only reached by
-  tail jumps or through pointers, and the CRT's setjmp/longjmp used by Lua error handling.
-- `x360/src/module/boot_fixes.cpp` works around a read of a not-yet-created object on the
-  first front-end frame, which the console tolerates and a PC does not.
-- Five small ReXGlue patches (`patches/rexglue-sdk/`): module loading by bare name,
-  dispatch table placement for two modules, precise vblank timing, and disc image support.
+| Folder | What it is |
+|---|---|
+| [`x360/`](x360/) | The Windows app (`src/`), the game-module hooks (`src/module/`) and the codegen manifest and analysis overrides (`config/`) |
+| [`launcher/`](launcher/) | The launcher (WPF, .NET 10): game check, settings, start |
+| [`patches/rexglue-sdk/`](patches/rexglue-sdk/) | Changes to the ReXGlue SDK, applied on top of a fixed SDK commit |
+| [`tools/build/`](tools/build/) | SDK setup, build and packaging scripts |
+| [`tools/analysis/`](tools/analysis/) | Reverse-engineering helpers used while porting (XEX image, PowerPC disassembly, missed functions) |
+| [`tools/dev/`](tools/dev/) | Automated test runs: start the game, drive the menus, take screenshots |
+| [`tools/disc.py`](tools/disc.py) | Detects and extracts Xbox 360 and PS3 disc images |
+| [`docs/`](docs/) | Player readme and images |
+
+The C++ translated from the game (`x360/generated/`) isn't part of this repository. It's generated on your
+own PC from your own copy of the game when you build.
 
 ## Credits
 
-- The [ReXGlue](https://github.com/rexglue/rexglue-sdk) team for the recompiler and runtime.
-- The [Xenia](https://xenia.jp) project, whose Xbox 360 research ReXGlue builds on.
+- Port by **Călin Miertescu** ([CalinGraphics](https://github.com/CalinGraphics)).
+- Built on [ReXGlue](https://github.com/rexglue/rexglue-sdk), the recompiler and runtime.
+- [Xenia](https://xenia.jp), whose Xbox 360 research, GPU and kernel code ReXGlue builds on.
+- **EA Canada** and **Electronic Arts** for the game.
 
 ## License
 
-This project's own code is under the BSD 3-Clause license (see [LICENSE](LICENSE)).
-It does not cover the game, its content, or code recompiled from it.
-Third-party components keep their own licenses.
+This project's own code (launcher, app, hooks, SDK patches, tools) is under the [BSD 3-Clause license](LICENSE).
+It doesn't cover the game, its content, or the code recompiled from it. Third-party components in the
+releases (the ReXGlue SDK, which builds on Xenia, FFmpeg, SDL and others) keep their own licenses, shipped
+in the `licenses` folder of every release.
 
-This is an unofficial fan project, not affiliated with or endorsed by EA, FIFA, Microsoft or Sony.
+## Legal
+
+Unofficial, non-profit fan project. Not affiliated with, endorsed or sponsored by Electronic Arts, EA Sports,
+FIFA or Microsoft. *2010 FIFA World Cup South Africa*, its content and trademarks belong to their owners.
+**Please don't open issues asking for game files.** If a rights holder raises a valid concern, it will be addressed.
