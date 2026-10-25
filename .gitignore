@@ -26,6 +26,7 @@ launcher/obj/
 
 # Built tools and the release zip
 *.exe
+*.dll
 *.zip
 
 # Editor / OS

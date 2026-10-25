@@ -52,5 +52,9 @@ $zip = Join-Path $outRoot "FIFA-World-Cup-2010-Recompiled-$version-win-x64.zip"
 Remove-Item $zip -ErrorAction SilentlyContinue
 Compress-Archive -Path $pkg -DestinationPath $zip -CompressionLevel Optimal
 $size = [math]::Round((Get-Item $zip).Length / 1MB, 1)
+
+# The same game and launcher in the repository folder too, so it plays from here
+# (git ignores *.exe and *.dll).
+Get-ChildItem $pkg -File | Where-Object Extension -in ".exe", ".dll" | Copy-Item -Destination $repo -Force
 Write-Host "Package: $pkg" -ForegroundColor Green
 Write-Host "Zip:     $zip ($size MB)" -ForegroundColor Green
