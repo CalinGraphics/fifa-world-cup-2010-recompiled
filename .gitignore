@@ -24,8 +24,9 @@ build/
 launcher/bin/
 launcher/obj/
 
-# Built tools
+# Built tools and the release zip
 *.exe
+*.zip
 
 # Editor / OS
 .vs/
