@@ -1,0 +1,39 @@
+name: Problem report
+description: Something doesn't work, looks wrong or runs slowly
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. Please don't ask for game files here: those requests get closed.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected, what you got. Screenshots help.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Shown on the launcher's left side (e.g. V0.3.0).
+    validations:
+      required: true
+  - type: input
+    id: gpu
+    attributes:
+      label: Graphics card and driver
+      placeholder: e.g. RTX 4060, driver 591.xx
+    validations:
+      required: true
+  - type: dropdown
+    id: settings
+    attributes:
+      label: Render resolution
+      options: ["720p", "1440p", "4K"]
+  - type: textarea
+    id: log
+    attributes:
+      label: Log
+      description: |
+        Drag the newest logs\fifawc10_*.log here (launcher: About, "Saves and logs").

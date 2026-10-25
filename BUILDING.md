@@ -70,7 +70,6 @@ Set by the game itself (`recomp\src\fifawc10_app.h`) unless the config file says
 | `patches/rexglue-sdk/` | SDK patches |
 | `tools/` | `setup_sdk.ps1`, `package.ps1`, `disc.py` (Xbox 360 / PS3 disc images), `fix_symlinks.py`, `make_icon.ps1` |
 | `tools/analysis/` | Reverse-engineering helpers (below) |
-| `tools/dev/` | Automated test runs (below) |
 
 Local only (git-ignored): `rexglue-sdk/`, `out/`, `recomp/generated/`, your `.iso`.
 
@@ -83,25 +82,6 @@ Local only (git-ignored): `rexglue-sdk/`, `out/`, `recomp/generated/`, your `.is
 | `autofix_codegen.py` | Re-runs codegen and adds missed function starts until analysis passes |
 | `find_code_pointers.py` | Finds functions only reached through pointers (vtables, callbacks) |
 | `find_setjmp.py`, `xref.py`, `callers.py` | Locate setjmp/longjmp, cross-references, callers |
-
-## Test scripts (`tools/dev/`)
-
-They run the game, drive it with the keyboard and save screenshots to `out\dev\`.
-The game copy is `$env:FIFAWC10_GAME`, or the first `.iso` in the repository folder.
-
-| Script | Use |
-|---|---|
-| `run_game.ps1` | Start `fifawc10.exe` (`-Config release`, `relwithdebinfo` or `package`), logging to `out\dev\run.log` |
-| `to_match.ps1` | Fresh profile, menus, into a match; screenshots on the way |
-| `to_training.ps1` | Fresh profile, menus, into Training Ground |
-| `black_test.ps1` | Training Ground with given switches, sampled once a second for black frames |
-| `burst.ps1` | Screenshots in quick succession, counting black ones |
-| `nav.ps1` | Key steps with a screenshot after each (`Return:8`, `Space:4`, `wait:10`, `shot`) |
-| `sheet.ps1` | Contact sheet of a run's screenshots |
-| `launcher_shots.ps1` | Screenshot every launcher tab |
-| `press.ps1`, `focus.ps1`, `screenshot.ps1`, `click_play.ps1` | Building blocks |
-
-Keyboard input only reaches the game while its window has focus, and with a gamepad connected the pad wins.
 
 ## Developer switches
 

@@ -29,14 +29,14 @@ and compiled for Windows, with a Direct3D 12 renderer. No emulator.
 
 | | |
 |---|---|
-| **Native PC port**, no emulator | **60 fps** in matches, or locked to 30, with an optional **FPS counter** |
+| **Native PC port**, no emulator | **60 fps** in matches, or locked to 30 |
 | Render at **720p, 1440p or 4K** | **Anisotropic filtering** up to 16x |
 | Runs **straight from your disc image** (`.iso`), nothing to extract | **Controller** (Xbox, PlayStation, others) or **keyboard** |
-| **Launcher** that checks your copy and holds every setting | Saves, settings and logs in one folder, or **portable** |
+| **Launcher** that checks your copy and holds every setting | **FPS counter** (F2), saves and logs in one folder, **portable** mode |
 
 ## Playing
 
-1. Download the latest zip from [Releases](https://github.com/CalinGraphics/fifa-world-cup-2010-recompiled/releases/latest)
+1. Download the zip from [Releases](https://github.com/CalinGraphics/fifa-world-cup-2010-recompiled/releases/latest)
    and extract it anywhere, e.g. `C:\Games\WC2010` (not inside `Program Files`).
 2. Run **`Launcher.exe`**.
    > The program isn't code-signed, so Windows may show "Windows protected your PC". Choose **More info**, then **Run anyway**.
@@ -48,11 +48,13 @@ Quit with **Alt+F4**; the game saves automatically.
 
 ### The launcher
 
-- **Play**: your game copy and its check, a summary of your settings
-- **Display**: window, borderless or exclusive fullscreen, window size, V-Sync, frame rate (60 or 30), FPS counter
-- **Graphics**: render resolution (720p / 1440p / 4K), texture filtering
-- **Controls**: controller or keyboard, with the keyboard layout
-- **About**: saves and logs folder, desktop shortcut, reset settings
+| Page | Settings |
+|---|---|
+| **Play** | Your game copy and its check, a summary of your settings |
+| **Display** | Window, borderless or exclusive fullscreen; window size; V-Sync; frame rate (60 or 30); FPS counter |
+| **Graphics** | Render resolution (720p / 1440p / 4K), texture filtering |
+| **Controls** | Controller or keyboard, with the keyboard layout |
+| **About** | Saves and logs folder, desktop shortcut, reset settings |
 
 On first start it picks settings for your screen (your monitor's size, 1440p rendering, or 4K on a 4K display).
 
@@ -109,6 +111,7 @@ and the launcher tells you so. The PS3 version is recognised but not supported.
 | The game doesn't start | Update your graphics driver (Direct3D 12 is required). Check the latest log in the saves and logs folder. |
 | Controller not detected | Connect it before pressing Kick off, and choose **Controller** on the Controls page. |
 | Low frame rate | Lower the render resolution to 1440p or 720p on the Graphics page. |
+| Laptop runs the game on the integrated GPU | Windows Settings → System → Display → Graphics: set `fifawc10.exe` to High performance. |
 
 Problems go in the [Issues](https://github.com/CalinGraphics/fifa-world-cup-2010-recompiled/issues).
 Attach the newest `logs\fifawc10_*.log` (About, **Saves and logs** opens the folder) and the launcher's version.
@@ -116,25 +119,25 @@ Attach the newest `logs\fifawc10_*.log` (About, **Saves and logs** opens the fol
 ## Building from source
 
 Building needs your own copy of the game too: the code generator reads its executables.
-The full steps are in [BUILDING.md](BUILDING.md). In short:
+Put your `.iso` in the repository folder, then:
 
 ```powershell
-# your .iso in the repository folder, then:
 powershell -ExecutionPolicy Bypass -File build.ps1 -Package
 ```
 
+The first build gets and builds the ReXGlue SDK too (about an hour); later builds take minutes.
+Requirements and details are in [BUILDING.md](BUILDING.md).
+
 ## Repository
 
-| Folder | What it is |
+| Path | What it is |
 |---|---|
 | [`build.ps1`](build.ps1) | The whole build: SDK, code generation, game, launcher, release zip |
-| [`recomp/`](recomp/) | The Windows app (`src/`), the game-module hooks (`src/module/`) and the codegen manifest and analysis overrides (`config/`) |
+| [`recomp/`](recomp/) | The Windows app (`src/`), the game-module hooks (`src/module/`), the codegen manifest and analysis overrides (`config/`) |
 | [`launcher/`](launcher/) | The launcher (WPF, .NET 10): game check, settings, start |
 | [`patches/rexglue-sdk/`](patches/rexglue-sdk/) | Changes to the ReXGlue SDK, applied on top of a fixed SDK commit |
-| [`tools/`](tools/) | SDK setup, packaging, disc image reader (`disc.py`) |
-| [`tools/analysis/`](tools/analysis/) | Reverse-engineering helpers used while porting (XEX image, PowerPC disassembly, missed functions) |
-| [`tools/dev/`](tools/dev/) | Automated test runs: start the game, drive the menus, take screenshots |
-| [`docs/`](docs/) | Player readme and images |
+| [`tools/`](tools/) | SDK setup, packaging, disc image reader, reverse-engineering helpers used while porting |
+| [`docs/`](docs/) | Player readme (shipped in the zip) and images |
 
 The C++ translated from the game (`recomp/generated/`) isn't part of this repository. It's generated on your
 own PC from your own copy of the game when you build.
