@@ -6,6 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Shapes;
 using Microsoft.Win32;
 
 namespace Fifawc10Launcher;
@@ -21,9 +22,13 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         var v = Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "";
-        AboutVersion.Text = $"Version {v}  -  launcher and game for Windows 10 / 11 (x64)";
+        TagLine.Text = $"NATIVE PC PORT   V{v}";
+        AboutVersion.Text = $"Version {v}. Windows 10 and 11, 64-bit.";
         Root.SizeChanged += (_, _) =>
-            Root.Clip = new RectangleGeometry(new Rect(0, 0, Root.ActualWidth, Root.ActualHeight), 15, 15);
+        {
+            Root.Clip = new RectangleGeometry(new Rect(0, 0, Root.ActualWidth, Root.ActualHeight), 10, 10);
+            BuildStadium();
+        };
         BuildKeyMap();
         FillWindowSizes();
         ApplyToUi();
@@ -44,14 +49,34 @@ public partial class MainWindow : Window
     void Tab_Checked(object sender, RoutedEventArgs e)
     {
         if (PagePlay is null) return;   // during InitializeComponent
-        PagePlay.Visibility = TabPlay.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
-        PageDisplay.Visibility = TabDisplay.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
-        PageGraphics.Visibility = TabGraphics.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
-        PageControls.Visibility = TabControls.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
-        PageAbout.Visibility = TabAbout.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
-        var page = new[] { PagePlay, PageDisplay, PageGraphics, (FrameworkElement)PageControls, PageAbout }
-            .First(p => p.Visibility == Visibility.Visible);
-        page.BeginAnimation(OpacityProperty, new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(180)));
+        var pages = new (RadioButton Tab, FrameworkElement Page)[]
+        {
+            (TabPlay, PagePlay), (TabDisplay, PageDisplay), (TabGraphics, PageGraphics),
+            (TabControls, PageControls), (TabAbout, PageAbout),
+        };
+        foreach (var (tab, page) in pages)
+        {
+            bool on = tab.IsChecked == true;
+            page.Visibility = on ? Visibility.Visible : Visibility.Collapsed;
+            if (!on) continue;
+            // a short slide in from the right, like a broadcast graphic
+            var move = new TranslateTransform(18, 0);
+            page.RenderTransform = move;
+            var ease = new QuarticEase { EasingMode = EasingMode.EaseOut };
+            move.BeginAnimation(TranslateTransform.XProperty, new DoubleAnimation(18, 0, TimeSpan.FromMilliseconds(260)) { EasingFunction = ease });
+            page.BeginAnimation(OpacityProperty, new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(200)));
+        }
+    }
+
+    void SheetRow_Click(object sender, RoutedEventArgs e)
+    {
+        var target = (string)((Button)sender).Tag switch
+        {
+            "graphics" => TabGraphics,
+            "controls" => TabControls,
+            _ => TabDisplay,
+        };
+        target.IsChecked = true;
     }
 
     // ---------------------------------------------------------------- settings <-> UI
@@ -67,7 +92,7 @@ public partial class MainWindow : Window
         foreach (var (w, h) in sizes.OrderBy(s => s.Item1 * s.Item2))
             WindowBox.Items.Add(new ComboBoxItem
             {
-                Content = w == sw && h == sh ? $"{w} x {h}  (your screen)" : $"{w} x {h}",
+                Content = w == sw && h == sh ? $"{w} × {h}   YOUR SCREEN" : $"{w} × {h}",
                 Tag = $"{w}x{h}",
             });
     }
@@ -108,21 +133,23 @@ public partial class MainWindow : Window
 
     void SaveQuietly()
     {
-        try { settings.Save(); } catch { /* saved again on Play */ }
+        try { settings.Save(); } catch { /* saved again on Kick off */ }
     }
 
     void UpdateSummary()
     {
-        SumRes.Text = settings.RenderScale switch { 1 => "720p", 3 => "4K", _ => "1440p" };
-        SumResHint.Text = settings.Display switch
+        SumRes.Text = settings.RenderScale switch { 1 => "720P", 3 => "4K", _ => "1440P" };
+        SumDisplay.Text = settings.Display switch
         {
-            "Window" => $"Window {settings.WindowWidth} x {settings.WindowHeight}",
-            "Fullscreen" => "Exclusive fullscreen",
-            _ => "Borderless fullscreen",
+            "Window" => $"WINDOW  {settings.WindowWidth} × {settings.WindowHeight}",
+            "Fullscreen" => "FULLSCREEN",
+            _ => "BORDERLESS",
         };
-        SumCtl.Text = settings.Controls == "Keyboard" ? "Keyboard" : "Controller";
-        SumCtlHint.Text = settings.Controls == "Keyboard" ? "WASD + Space" : "Xbox / PlayStation";
-        SumFpsHint.Text = settings.VSync ? "In matches, V-Sync on" : "In matches, V-Sync off";
+        SumCtl.Text = settings.Controls == "Keyboard" ? "KEYBOARD" : "CONTROLLER";
+        SumFps.Text = settings.VSync ? "60  ·  V-SYNC" : "60  ·  NO V-SYNC";
+        CtlHint.Text = settings.Controls == "Keyboard"
+            ? "The keyboard plays as a controller. The keys:"
+            : "Xbox, PlayStation and most other gamepads. Connect it before Kick off. Keyboard keys, if you need them:";
     }
 
     // ---------------------------------------------------------------- game copy
@@ -134,8 +161,8 @@ public partial class MainWindow : Window
         PlayButton.IsEnabled = false;
         if (string.IsNullOrEmpty(path)) { ShowCheck(GameSource.Check(path)); return; }
         SetBusy(true);
-        StatusTitle.Text = "Checking your copy...";
-        StatusText.Text = "Making sure it is the version this port was built from.";
+        StatusTitle.Text = "Checking your copy";
+        StatusText.Text = "Making sure it's the disc this port was built from.";
         Task.Run(() => GameSource.Check(path)).ContinueWith(t => Dispatcher.Invoke(() =>
         {
             if (settings.GamePath != path) return;
@@ -147,50 +174,59 @@ public partial class MainWindow : Window
 
     void SetBusy(bool busy)
     {
-        StatusBusy.Visibility = busy ? Visibility.Visible : Visibility.Collapsed;
-        StatusIcon.Visibility = busy ? Visibility.Collapsed : Visibility.Visible;
-        BusySpin.BeginAnimation(RotateTransform.AngleProperty, busy
-            ? new DoubleAnimation(0, 360, TimeSpan.FromSeconds(1)) { RepeatBehavior = RepeatBehavior.Forever }
+        Busy.Visibility = busy ? Visibility.Visible : Visibility.Collapsed;
+        if (busy) Stamp.Visibility = Visibility.Collapsed;
+        Busy.BeginAnimation(OpacityProperty, busy && Motion
+            ? new DoubleAnimation(1, 0.3, TimeSpan.FromMilliseconds(500)) { AutoReverse = true, RepeatBehavior = RepeatBehavior.Forever }
             : null);
     }
 
     void ShowCheck(GameCheck c)
     {
         check = c;
-        var good = (Brush)FindResource("Good");
-        var bad = (Brush)FindResource("Bad");
-        var dim = (Brush)FindResource("Dim");
+        var good = (Brush)FindResource("Green");
+        var bad = (Brush)FindResource("Red");
         if (c.Playable)
         {
-            StatusTitle.Text = c.Kind == SourceKind.Xbox360Iso ? "Xbox 360 disc image - ready" : "Xbox 360 game folder - ready";
-            StatusText.Text = "Verified: this is the copy the port was built from.";
-            StatusIcon.Data = Geometry.Parse("M0,8 L7,15 L22,0");
-            StatusIcon.Stroke = Brushes.White;
-            StatusRing.Fill = good;
+            StatusTitle.Text = c.Kind == SourceKind.Xbox360Iso ? "Xbox 360 disc image" : "Xbox 360 game folder";
+            StatusText.Text = "The exact disc this port was built from. Ready when you are.";
+            ShowStamp("VERIFIED", good);
             ReadyDot.Fill = good;
-            ReadyText.Text = "Ready to play";
+            ReadyText.Text = "READY";
         }
         else if (c.Kind == SourceKind.None)
         {
             StatusTitle.Text = "No game selected";
             StatusText.Text = "Choose your Xbox 360 disc image, or drop it on this window.";
-            StatusIcon.Data = Geometry.Parse("M11,0 L11,22 M0,11 L22,11");
-            StatusIcon.Stroke = (Brush)FindResource("Muted");
-            StatusRing.Fill = new SolidColorBrush(Color.FromRgb(0x22, 0x34, 0x2B));
-            ReadyDot.Fill = dim;
-            ReadyText.Text = "Choose your game to play";
+            Stamp.Visibility = Visibility.Collapsed;
+            ReadyDot.Fill = (Brush)FindResource("Dim");
+            ReadyText.Text = "CHOOSE YOUR GAME";
         }
         else
         {
-            StatusTitle.Text = c.Kind == SourceKind.Ps3Iso ? "PS3 disc image - not supported yet" : "This copy can't be used";
+            StatusTitle.Text = c.Kind == SourceKind.Ps3Iso ? "PS3 disc image" : "Can't use this copy";
             StatusText.Text = c.Message;
-            StatusIcon.Data = Geometry.Parse("M0,0 L16,16 M16,0 L0,16");
-            StatusIcon.Stroke = Brushes.White;
-            StatusRing.Fill = bad;
+            ShowStamp(c.Kind == SourceKind.Ps3Iso ? "PS3" : "REJECTED", bad);
             ReadyDot.Fill = bad;
-            ReadyText.Text = "Choose another copy";
+            ReadyText.Text = "CHOOSE ANOTHER COPY";
         }
         PlayButton.IsEnabled = c.Playable;
+    }
+
+    void ShowStamp(string text, Brush brush)
+    {
+        StampText.Text = text;
+        StampText.Foreground = brush;
+        Stamp.BorderBrush = brush;
+        Stamp.Visibility = Visibility.Visible;
+        if (!Motion) return;
+        // stamped down: a quick drop from a little larger
+        var scale = new ScaleTransform(1.35, 1.35);
+        Stamp.RenderTransform = new TransformGroup { Children = { scale, new RotateTransform(-7) } };
+        var ease = new BackEase { Amplitude = 0.4, EasingMode = EasingMode.EaseOut };
+        scale.BeginAnimation(ScaleTransform.ScaleXProperty, new DoubleAnimation(1.35, 1, TimeSpan.FromMilliseconds(260)) { EasingFunction = ease });
+        scale.BeginAnimation(ScaleTransform.ScaleYProperty, new DoubleAnimation(1.35, 1, TimeSpan.FromMilliseconds(260)) { EasingFunction = ease });
+        Stamp.BeginAnimation(OpacityProperty, new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(140)));
     }
 
     void BrowseIso_Click(object sender, RoutedEventArgs e)
@@ -242,34 +278,40 @@ public partial class MainWindow : Window
     {
         (string, string)[] left =
         {
-            ("Move", "W  A  S  D"), ("Short pass (A)", "Space"), ("Shoot (B)", "Backspace"),
-            ("Lob / cross (X)", "L"), ("Through ball (Y)", "P"), ("Sprint (RT)", "E"),
+            ("Move", "W A S D"), ("Short pass", "SPACE"), ("Shoot", "BACKSPACE"),
+            ("Lob, cross", "L"), ("Through ball", "P"), ("Sprint", "E"),
         };
         (string, string)[] right =
         {
-            ("Pace control (LT)", "Q"), ("Player run / finesse (LB / RB)", "1  /  3"), ("Skill moves (right stick)", "Arrows"),
-            ("D-pad", "Shift + Arrows"), ("Pause / Back", "Enter  /  Tab"), ("Performance overlay", "F3"),
+            ("Pace control", "Q"), ("Player run, finesse", "1  3"), ("Skill moves", "ARROWS"),
+            ("D-pad", "SHIFT + ARROWS"), ("Pause, back", "ENTER  TAB"), ("Frame rate", "F3"),
         };
         foreach (var (a, k) in left) KeyMapLeft.Children.Add(KeyRow(a, k));
         foreach (var (a, k) in right) KeyMapRight.Children.Add(KeyRow(a, k));
     }
 
-    Grid KeyRow(string action, string keys)
+    Border KeyRow(string action, string keys)
     {
-        var g = new Grid { Margin = new Thickness(0, 5, 0, 5) };
-        g.Children.Add(new TextBlock { Text = action, Foreground = (Brush)FindResource("Muted"), FontSize = 13 });
+        var g = new Grid();
+        g.Children.Add(new TextBlock
+        {
+            Text = action, Foreground = (Brush)FindResource("Muted"), FontSize = 13, VerticalAlignment = VerticalAlignment.Center,
+        });
         var chip = new Border
         {
-            Background = new SolidColorBrush(Color.FromRgb(0x0F, 0x18, 0x14)),
-            BorderBrush = (Brush)FindResource("Line"),
+            BorderBrush = (Brush)FindResource("HairStrong"),
             BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(5),
-            Padding = new Thickness(8, 2, 8, 2),
+            Padding = new Thickness(8, 1, 8, 1),
             HorizontalAlignment = HorizontalAlignment.Right,
-            Child = new TextBlock { Text = keys, FontFamily = (FontFamily)FindResource("DisplayWide"), FontSize = 12.5 },
+            RenderTransform = new SkewTransform(-14, 0),
+            Child = new TextBlock { Text = keys, FontFamily = (FontFamily)FindResource("Caps"), FontSize = 12.5 },
         };
         g.Children.Add(chip);
-        return g;
+        return new Border
+        {
+            BorderBrush = (Brush)FindResource("Hair"), BorderThickness = new Thickness(0, 1, 0, 0),
+            Padding = new Thickness(0, 8, 4, 8), Child = g,
+        };
     }
 
     // ---------------------------------------------------------------- about page
@@ -281,9 +323,9 @@ public partial class MainWindow : Window
     {
         try
         {
-            var link = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
-                                    "2010 FIFA World Cup Recompiled.lnk");
-            var exe = Environment.ProcessPath ?? Path.Combine(AppContext.BaseDirectory, "Launcher.exe");
+            var link = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
+                                              "2010 FIFA World Cup Recompiled.lnk");
+            var exe = Environment.ProcessPath ?? System.IO.Path.Combine(AppContext.BaseDirectory, "Launcher.exe");
             var shellType = Type.GetTypeFromProgID("WScript.Shell")!;
             dynamic shell = Activator.CreateInstance(shellType)!;
             dynamic sc = shell.CreateShortcut(link);
@@ -294,7 +336,7 @@ public partial class MainWindow : Window
             sc.Save();
             Toast("Shortcut added to your desktop.");
         }
-        catch (Exception ex) { Toast($"Could not create the shortcut: {ex.Message}"); }
+        catch (Exception ex) { Toast($"Couldn't create the shortcut: {ex.Message}"); }
     }
 
     void Reset_Click(object sender, RoutedEventArgs e)
@@ -307,7 +349,7 @@ public partial class MainWindow : Window
         loading = false;
         UpdateSummary();
         SaveQuietly();
-        Toast("Settings reset to the defaults for this PC.");
+        Toast("Settings are back to the defaults for this PC.");
     }
 
     void Toast(string text)
@@ -324,16 +366,16 @@ public partial class MainWindow : Window
         });
     }
 
-    // ---------------------------------------------------------------- play
+    // ---------------------------------------------------------------- kick off
 
     void Play_Click(object sender, RoutedEventArgs e)
     {
         if (check is not { Playable: true }) return;
         ReadFromUi();
-        var exe = Path.Combine(AppContext.BaseDirectory, GameExe);
+        var exe = System.IO.Path.Combine(AppContext.BaseDirectory, GameExe);
         if (!File.Exists(exe))
         {
-            Toast($"{GameExe} was not found next to the launcher.");
+            Toast($"{GameExe} isn't next to the launcher.");
             return;
         }
         if (Process.GetProcessesByName("fifawc10").Length > 0)
@@ -344,8 +386,7 @@ public partial class MainWindow : Window
         try
         {
             settings.Save();
-            // The data folder is the working folder, so logs land next to saves and settings
-            // (never in Program Files).
+            // The data folder is the working folder, so logs land next to saves and settings.
             Process.Start(new ProcessStartInfo(exe)
             {
                 WorkingDirectory = Settings.DataFolder,
@@ -355,7 +396,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            Toast($"Could not start the game: {ex.Message}");
+            Toast($"Couldn't start the game: {ex.Message}");
         }
     }
 }

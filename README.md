@@ -42,7 +42,7 @@ and compiled for Windows, with a Direct3D 12 renderer. No emulator.
    > The program isn't code-signed, so Windows may show "Windows protected your PC". Choose **More info**, then **Run anyway**.
 3. Click **Choose disc image** and pick your Xbox 360 `.iso` (or drop it on the window).
    The launcher checks that it's the right version.
-4. Press **PLAY**.
+4. Press **KICK OFF**.
 
 Quit with **Alt+F4**; the game saves automatically.
 
@@ -107,7 +107,7 @@ and the launcher tells you so. The PS3 version is recognised but not supported.
 |---|---|
 | "This copy is a different version" | You need the Europe Xbox 360 disc (En, Es, Nl); see the hashes above. |
 | The game doesn't start | Update your graphics driver (Direct3D 12 is required). Check the latest log in the saves and logs folder. |
-| Controller not detected | Connect it before pressing Play, and choose **Controller** on the Controls page. |
+| Controller not detected | Connect it before pressing Kick off, and choose **Controller** on the Controls page. |
 | Low frame rate | Lower the render resolution to 1440p or 720p on the Graphics page. |
 
 Problems go in the [Issues](https://github.com/CalinGraphics/fifa-world-cup-2010-recompiled/issues).

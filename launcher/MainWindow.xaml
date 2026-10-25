@@ -2,398 +2,310 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="2010 FIFA World Cup South Africa: Recompiled"
-        Width="1140" Height="720" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen"
+        Width="1180" Height="720" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen"
         WindowStyle="None" AllowsTransparency="True" Background="Transparent"
         AllowDrop="True" Drop="Window_Drop" DragOver="Window_DragOver"
         FontFamily="{StaticResource Body}" Foreground="{StaticResource Text}" FontSize="14"
         TextOptions.TextFormattingMode="Display" UseLayoutRounding="True">
 
-  <Border x:Name="Frame" Margin="14" CornerRadius="16" Background="{StaticResource Bg}"
-          BorderBrush="#2A3D33" BorderThickness="1">
+  <Border Margin="14" CornerRadius="10" Background="{StaticResource Night}">
     <Border.Effect>
-      <DropShadowEffect BlurRadius="24" ShadowDepth="0" Opacity="0.55" Color="Black"/>
+      <DropShadowEffect BlurRadius="26" ShadowDepth="0" Opacity="0.6" Color="Black"/>
     </Border.Effect>
     <Grid x:Name="Root">
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="380"/>
-        <ColumnDefinition Width="*"/>
-      </Grid.ColumnDefinitions>
+      <Grid.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+          <GradientStop Color="#04060A" Offset="0"/>
+          <GradientStop Color="#0A1016" Offset="0.42"/>
+          <GradientStop Color="#090B0B" Offset="1"/>
+        </LinearGradientBrush>
+      </Grid.Background>
 
-      <!-- ===================== HERO ===================== -->
-      <Grid x:Name="Hero" ClipToBounds="True" MouseLeftButtonDown="Drag_MouseDown">
-        <Grid.Background>
-          <LinearGradientBrush StartPoint="0,0" EndPoint="0.3,1">
-            <GradientStop Color="#0F4A33" Offset="0"/>
-            <GradientStop Color="#0A2C20" Offset="0.55"/>
-            <GradientStop Color="#071710" Offset="1"/>
+      <!-- Stadium at night: drawn in code (MainWindow.Stadium.cs) -->
+      <Canvas x:Name="Stadium" IsHitTestVisible="False"/>
+      <Canvas x:Name="Confetti" IsHitTestVisible="False"/>
+
+      <!-- legibility: dark floor under the title -->
+      <Rectangle IsHitTestVisible="False">
+        <Rectangle.Fill>
+          <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="#00000000" Offset="0.45"/>
+            <GradientStop Color="#C0050607" Offset="0.86"/>
+            <GradientStop Color="#F0050607" Offset="1"/>
           </LinearGradientBrush>
-        </Grid.Background>
+        </Rectangle.Fill>
+      </Rectangle>
 
-        <!-- floodlight glow -->
-        <Ellipse Width="520" Height="420" Margin="-60,-220,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
-          <Ellipse.Fill>
-            <RadialGradientBrush>
-              <GradientStop Color="#55FFE9A6" Offset="0"/>
-              <GradientStop Color="#00FFE9A6" Offset="1"/>
-            </RadialGradientBrush>
-          </Ellipse.Fill>
-        </Ellipse>
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*"/>
+          <ColumnDefinition Width="560"/>
+        </Grid.ColumnDefinitions>
 
-        <!-- pitch markings -->
-        <Canvas Opacity="0.10">
-          <Ellipse Canvas.Left="70" Canvas.Top="180" Width="240" Height="240" Stroke="White" StrokeThickness="3"/>
-          <Line X1="0" Y1="300" X2="380" Y2="300" Stroke="White" StrokeThickness="3"/>
-          <Ellipse Canvas.Left="184" Canvas.Top="294" Width="12" Height="12" Fill="White"/>
-          <Rectangle Canvas.Left="100" Canvas.Top="-4" Width="180" Height="70" Stroke="White" StrokeThickness="3"/>
-        </Canvas>
-
-        <!-- ball -->
-        <Canvas Margin="0,0,0,0" Opacity="0.95">
-          <Canvas Canvas.Left="208" Canvas.Top="44">
-            <Ellipse Width="230" Height="230">
-              <Ellipse.Fill>
-                <RadialGradientBrush GradientOrigin="0.35,0.3" Center="0.4,0.35" RadiusX="0.7" RadiusY="0.7">
-                  <GradientStop Color="#FFFFFF" Offset="0"/>
-                  <GradientStop Color="#E9EEE9" Offset="0.6"/>
-                  <GradientStop Color="#A9B8AF" Offset="1"/>
-                </RadialGradientBrush>
-              </Ellipse.Fill>
-            </Ellipse>
-            <!-- panels -->
-            <Path Fill="#13221B" Data="M115,72 L146,95 L134,131 L96,131 L84,95 Z"/>
-            <Path Fill="#13221B" Data="M24,78 L52,70 L68,96 L52,124 L22,120 Q12,98 24,78 Z"/>
-            <Path Fill="#13221B" Data="M178,70 L206,78 Q218,98 208,120 L178,124 L162,96 Z"/>
-            <Path Fill="#13221B" Data="M70,186 L98,170 L132,170 L160,186 Q118,214 70,186 Z"/>
-            <Path Fill="#13221B" Data="M90,16 Q115,6 140,16 L134,38 L96,38 Z"/>
-            <Path Stroke="#13221B" StrokeThickness="2.5" Data="M115,72 L115,38 M146,95 L178,96 M134,131 L150,172 M96,131 L80,172 M84,95 L52,96 M96,38 L68,58 M134,38 L162,58"/>
-            <!-- gold swirl accent -->
-            <Path Stroke="{StaticResource Gold}" StrokeThickness="5" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
-                  Data="M30,150 Q70,215 150,205"/>
-            <Path Stroke="{StaticResource Red}" StrokeThickness="4" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
-                  Data="M200,60 Q222,110 205,150"/>
-          </Canvas>
-        </Canvas>
-
-        <!-- flag ribbons -->
-        <Canvas>
-          <Polygon Points="-40,560 380,430 380,470 -40,600" Fill="{StaticResource Red}" Opacity="0.95"/>
-          <Polygon Points="-40,604 380,474 380,490 -40,620" Fill="White" Opacity="0.9"/>
-          <Polygon Points="-40,624 380,494 380,540 -40,670" Fill="{StaticResource Green}"/>
-          <Polygon Points="-40,674 380,544 380,560 -40,690" Fill="{StaticResource Gold}"/>
-          <Polygon Points="-40,694 380,564 380,620 -40,750" Fill="{StaticResource Blue}" Opacity="0.95"/>
-        </Canvas>
-
-        <!-- title -->
-        <StackPanel VerticalAlignment="Top" Margin="34,300,24,0">
-          <TextBlock Text="FIFA WORLD CUP 2010" Style="{StaticResource Overline}" FontSize="14"/>
-          <TextBlock Text="SOUTH" FontFamily="{StaticResource Display}" FontSize="72" Foreground="White" Margin="0,2,0,-22"/>
-          <TextBlock Text="AFRICA" FontFamily="{StaticResource Display}" FontSize="72" Foreground="White"/>
-          <Border Background="{StaticResource Gold}" CornerRadius="4" Padding="10,3" HorizontalAlignment="Left" Margin="2,4,0,0">
-            <TextBlock Text="RECOMPILED" FontFamily="{StaticResource DisplayWide}" FontSize="13" Foreground="#1A1205"/>
-          </Border>
-        </StackPanel>
-      </Grid>
-
-      <!-- ===================== CONTENT ===================== -->
-      <Grid Grid.Column="1">
-        <Grid.RowDefinitions>
-          <RowDefinition Height="Auto"/>
-          <RowDefinition Height="*"/>
-          <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-
-        <!-- top bar: tabs + window buttons -->
-        <Grid Background="Transparent" MouseLeftButtonDown="Drag_MouseDown" Margin="34,14,10,0">
-          <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="0,14,0,0">
-            <RadioButton x:Name="TabPlay" Content="PLAY" GroupName="nav" Style="{StaticResource NavTab}" IsChecked="True" Checked="Tab_Checked"/>
-            <RadioButton x:Name="TabDisplay" Content="DISPLAY" GroupName="nav" Style="{StaticResource NavTab}" Checked="Tab_Checked"/>
-            <RadioButton x:Name="TabGraphics" Content="GRAPHICS" GroupName="nav" Style="{StaticResource NavTab}" Checked="Tab_Checked"/>
-            <RadioButton x:Name="TabControls" Content="CONTROLS" GroupName="nav" Style="{StaticResource NavTab}" Checked="Tab_Checked"/>
-            <RadioButton x:Name="TabAbout" Content="ABOUT" GroupName="nav" Style="{StaticResource NavTab}" Checked="Tab_Checked"/>
+        <!-- ===================== LEFT: stage ===================== -->
+        <Grid Background="Transparent" MouseLeftButtonDown="Drag_MouseDown">
+          <StackPanel Orientation="Horizontal" Margin="34,26,0,0" VerticalAlignment="Top" HorizontalAlignment="Left">
+            <Border Background="{StaticResource GoldMetal}" Padding="9,2,9,1" VerticalAlignment="Center">
+              <Border.RenderTransform><SkewTransform AngleX="-14"/></Border.RenderTransform>
+              <TextBlock Text="WC10" FontFamily="{StaticResource DisplayBold}" FontSize="15" Foreground="#17110A"/>
+            </Border>
+            <TextBlock Text="RECOMPILED" FontFamily="{StaticResource Caps}" FontSize="13" Foreground="#C9C8BF"
+                       VerticalAlignment="Center" Margin="12,1,0,0"/>
           </StackPanel>
-          <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
-            <Button Content="&#xE921;" Style="{StaticResource CaptionButton}" Click="Minimize_Click" ToolTip="Minimize"/>
-            <Button Content="&#xE8BB;" Style="{StaticResource CloseButton}" Click="Close_Click" ToolTip="Close"/>
+
+          <StackPanel VerticalAlignment="Bottom" Margin="34,0,20,40">
+            <TextBlock Text="2010 FIFA WORLD CUP" Style="{StaticResource Label}" FontSize="15"/>
+            <TextBlock Text="SOUTH" FontFamily="{StaticResource DisplayBold}" FontSize="104" Foreground="White"
+                       Margin="-3,-6,0,-34"/>
+            <TextBlock Text="AFRICA" FontFamily="{StaticResource DisplayBold}" FontSize="104" Foreground="White"
+                       Margin="-3,0,0,-14"/>
+            <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+              <Rectangle Width="26" Height="4" Fill="{StaticResource Green}"/>
+              <Rectangle Width="26" Height="4" Fill="{StaticResource Gold}"/>
+              <Rectangle Width="26" Height="4" Fill="{StaticResource Red}"/>
+              <TextBlock x:Name="TagLine" Text="Native PC port" FontFamily="{StaticResource Caps}" FontSize="13"
+                         Foreground="#B9BAB3" Margin="14,-7,0,0"/>
+            </StackPanel>
           </StackPanel>
         </Grid>
-        <Border Grid.Row="0" Height="1" Background="{StaticResource Line}" VerticalAlignment="Bottom" Margin="34,0,34,0"/>
 
-        <!-- pages -->
-        <Grid Grid.Row="1" Margin="34,24,34,0">
-
-          <!-- PLAY -->
-          <StackPanel x:Name="PagePlay">
-            <TextBlock Text="KICK-OFF" Style="{StaticResource Overline}"/>
-            <TextBlock Text="Your game" Style="{StaticResource H1}" Margin="0,2,0,16"/>
-
-            <Border x:Name="GameCard" Style="{StaticResource CardBorder}" Padding="20,18">
-              <Grid>
-                <Grid.ColumnDefinitions>
-                  <ColumnDefinition Width="Auto"/>
-                  <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Grid Width="52" Height="52" VerticalAlignment="Top">
-                  <Ellipse x:Name="StatusRing" Fill="#22342B"/>
-                  <Path x:Name="StatusIcon" Stroke="{StaticResource Muted}" StrokeThickness="3" StrokeStartLineCap="Round"
-                        StrokeEndLineCap="Round" Width="22" Height="16" Stretch="Uniform" Data="M0,8 L7,15 L22,0"/>
-                  <TextBlock x:Name="StatusBusy" Text="&#xE895;" FontFamily="Segoe MDL2 Assets" FontSize="20"
-                             Foreground="{StaticResource Gold}" HorizontalAlignment="Center" VerticalAlignment="Center"
-                             Visibility="Collapsed" RenderTransformOrigin="0.5,0.5">
-                    <TextBlock.RenderTransform><RotateTransform x:Name="BusySpin"/></TextBlock.RenderTransform>
-                  </TextBlock>
-                </Grid>
-                <StackPanel Grid.Column="1" Margin="18,0,0,0">
-                  <TextBlock x:Name="StatusTitle" Text="No game selected" Style="{StaticResource CardTitle}" FontSize="19"/>
-                  <TextBlock x:Name="StatusText" Text="Choose your Xbox 360 disc image, or drop it on this window."
-                             Style="{StaticResource Hint}" Margin="0,4,0,0" FontSize="13.5"/>
-                  <TextBlock x:Name="GamePathText" Foreground="{StaticResource Dim}" FontSize="12" Margin="0,8,0,0"
-                             TextTrimming="CharacterEllipsis"/>
-                  <StackPanel Orientation="Horizontal" Margin="0,14,0,0">
-                    <Button Style="{StaticResource GhostButton}" Click="BrowseIso_Click">
-                      <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="&#xE958;" FontFamily="Segoe MDL2 Assets" Margin="0,1,8,0" Foreground="{StaticResource Gold}"/>
-                        <TextBlock Text="Choose disc image"/>
-                      </StackPanel>
-                    </Button>
-                    <Button Style="{StaticResource GhostButton}" Margin="10,0,0,0" Click="BrowseFolder_Click">
-                      <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="&#xE8B7;" FontFamily="Segoe MDL2 Assets" Margin="0,1,8,0" Foreground="{StaticResource Gold}"/>
-                        <TextBlock Text="Game folder"/>
-                      </StackPanel>
-                    </Button>
-                  </StackPanel>
-                </StackPanel>
-              </Grid>
-            </Border>
-
-            <UniformGrid Columns="3" Margin="0,16,0,0">
-              <Border Style="{StaticResource CardBorder}" Margin="0,0,8,0" Padding="16,14">
-                <StackPanel>
-                  <TextBlock Text="RESOLUTION" Style="{StaticResource Overline}" Foreground="{StaticResource Muted}"/>
-                  <TextBlock x:Name="SumRes" FontFamily="{StaticResource Display}" FontSize="26" Margin="0,4,0,0"/>
-                  <TextBlock x:Name="SumResHint" Style="{StaticResource Hint}" FontSize="12"/>
-                </StackPanel>
-              </Border>
-              <Border Style="{StaticResource CardBorder}" Margin="4,0,4,0" Padding="16,14">
-                <StackPanel>
-                  <TextBlock Text="FRAME RATE" Style="{StaticResource Overline}" Foreground="{StaticResource Muted}"/>
-                  <TextBlock Text="60 FPS" FontFamily="{StaticResource Display}" FontSize="26" Margin="0,4,0,0"/>
-                  <TextBlock x:Name="SumFpsHint" Text="In matches" Style="{StaticResource Hint}" FontSize="12"/>
-                </StackPanel>
-              </Border>
-              <Border Style="{StaticResource CardBorder}" Margin="8,0,0,0" Padding="16,14">
-                <StackPanel>
-                  <TextBlock Text="CONTROLS" Style="{StaticResource Overline}" Foreground="{StaticResource Muted}"/>
-                  <TextBlock x:Name="SumCtl" FontFamily="{StaticResource Display}" FontSize="26" Margin="0,4,0,0"/>
-                  <TextBlock x:Name="SumCtlHint" Style="{StaticResource Hint}" FontSize="12"/>
-                </StackPanel>
-              </Border>
-            </UniformGrid>
-
-            <Border Style="{StaticResource CardBorder}" Margin="0,16,0,0" Padding="20,14">
-              <StackPanel>
-                <TextBlock Text="BEFORE KICK-OFF" Style="{StaticResource Overline}" Foreground="{StaticResource Muted}"/>
-                <UniformGrid Columns="3" Margin="0,10,0,0">
-                  <StackPanel Orientation="Horizontal" Margin="0,0,12,0">
-                    <TextBlock Text="&#xE7FC;" FontFamily="Segoe MDL2 Assets" FontSize="18" Foreground="{StaticResource Gold}" VerticalAlignment="Top" Margin="0,2,10,0"/>
-                    <TextBlock Style="{StaticResource Hint}" Width="150">Connect your controller before you press Play.</TextBlock>
-                  </StackPanel>
-                  <StackPanel Orientation="Horizontal" Margin="0,0,12,0">
-                    <TextBlock Text="&#xE9D9;" FontFamily="Segoe MDL2 Assets" FontSize="18" Foreground="{StaticResource Gold}" VerticalAlignment="Top" Margin="0,2,10,0"/>
-                    <TextBlock Style="{StaticResource Hint}" Width="150">F3 in game shows the frame rate overlay.</TextBlock>
-                  </StackPanel>
-                  <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="&#xE7E8;" FontFamily="Segoe MDL2 Assets" FontSize="18" Foreground="{StaticResource Gold}" VerticalAlignment="Top" Margin="0,2,10,0"/>
-                    <TextBlock Style="{StaticResource Hint}" Width="150">Alt+F4 quits. Progress saves automatically.</TextBlock>
-                  </StackPanel>
-                </UniformGrid>
-              </StackPanel>
-            </Border>
-            <TextBlock Style="{StaticResource Hint}" Margin="2,14,0,0" Foreground="{StaticResource Dim}">
-              Runs natively from your own disc image. Nothing is installed or extracted.
-            </TextBlock>
-          </StackPanel>
-
-          <!-- DISPLAY -->
-          <StackPanel x:Name="PageDisplay" Visibility="Collapsed">
-            <TextBlock Text="SCREEN" Style="{StaticResource Overline}"/>
-            <TextBlock Text="Display" Style="{StaticResource H1}" Margin="0,2,0,16"/>
-
-            <Border Style="{StaticResource CardBorder}">
-              <Grid>
-                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                <StackPanel>
-                  <TextBlock Text="Window mode" Style="{StaticResource CardTitle}"/>
-                  <TextBlock Text="Borderless fills the screen and switches instantly with Alt+Tab." Style="{StaticResource Hint}" Margin="0,3,0,0"/>
-                </StackPanel>
-                <Border Grid.Column="1" Margin="20,0,0,0" Style="{StaticResource SegmentHost}" HorizontalAlignment="Right" VerticalAlignment="Center">
-                  <StackPanel Orientation="Horizontal">
-                    <RadioButton x:Name="ModeWindow" Content="Window" GroupName="mode" Style="{StaticResource Segment}" Checked="Setting_Changed"/>
-                    <RadioButton x:Name="ModeBorderless" Content="Borderless" GroupName="mode" Style="{StaticResource Segment}" Checked="Setting_Changed"/>
-                    <RadioButton x:Name="ModeFullscreen" Content="Fullscreen" GroupName="mode" Style="{StaticResource Segment}" Checked="Setting_Changed"/>
-                  </StackPanel>
-                </Border>
-              </Grid>
-            </Border>
-
-            <Border Style="{StaticResource CardBorder}" Margin="0,12,0,0">
-              <Grid>
-                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                <StackPanel>
-                  <TextBlock Text="Window size" Style="{StaticResource CardTitle}"/>
-                  <TextBlock Text="Used in window mode." Style="{StaticResource Hint}" Margin="0,3,0,0"/>
-                </StackPanel>
-                <ComboBox x:Name="WindowBox" Grid.Column="1" Margin="20,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Center" SelectionChanged="Setting_Changed"/>
-              </Grid>
-            </Border>
-
-            <Border Style="{StaticResource CardBorder}" Margin="0,12,0,0">
-              <Grid>
-                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                <StackPanel>
-                  <TextBlock Text="V-Sync" Style="{StaticResource CardTitle}"/>
-                  <TextBlock Text="Smooth, tear-free picture. Keep it on unless your display has its own sync." Style="{StaticResource Hint}" Margin="0,3,0,0"/>
-                </StackPanel>
-                <CheckBox x:Name="VSyncBox" Grid.Column="1" Margin="20,0,0,0" Style="{StaticResource Switch}" HorizontalAlignment="Right" VerticalAlignment="Center"
-                          Checked="Setting_Changed" Unchecked="Setting_Changed"/>
-              </Grid>
-            </Border>
-          </StackPanel>
-
-          <!-- GRAPHICS -->
-          <StackPanel x:Name="PageGraphics" Visibility="Collapsed">
-            <TextBlock Text="PICTURE" Style="{StaticResource Overline}"/>
-            <TextBlock Text="Graphics" Style="{StaticResource H1}" Margin="0,2,0,16"/>
-
-            <TextBlock Text="Render resolution" Style="{StaticResource CardTitle}"/>
-            <TextBlock Text="The game draws at this resolution and is scaled to your window. Higher is sharper and needs a stronger graphics card."
-                       Style="{StaticResource Hint}" Margin="0,3,0,10"/>
-            <UniformGrid Columns="3">
-              <RadioButton x:Name="Scale1" Content="720p" Tag="Original, 1280 x 720" GroupName="scale" Style="{StaticResource OptionCard}" Checked="Setting_Changed"/>
-              <RadioButton x:Name="Scale2" Content="1440p" Tag="Sharp, 2560 x 1440 - recommended" GroupName="scale" Style="{StaticResource OptionCard}" Checked="Setting_Changed"/>
-              <RadioButton x:Name="Scale3" Content="4K" Tag="Ultra, 3840 x 2160" GroupName="scale" Style="{StaticResource OptionCard}" Margin="0" Checked="Setting_Changed"/>
-            </UniformGrid>
-
-            <Border Style="{StaticResource CardBorder}" Margin="0,16,0,0">
-              <Grid>
-                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                <StackPanel>
-                  <TextBlock Text="Texture filtering" Style="{StaticResource CardTitle}"/>
-                  <TextBlock Text="Keeps the pitch and the stands sharp at an angle." Style="{StaticResource Hint}" Margin="0,3,0,0"/>
-                </StackPanel>
-                <Border Grid.Column="1" Margin="20,0,0,0" Style="{StaticResource SegmentHost}" HorizontalAlignment="Right" VerticalAlignment="Center">
-                  <StackPanel Orientation="Horizontal">
-                    <RadioButton x:Name="AnisoOff" Content="Original" GroupName="aniso" Style="{StaticResource Segment}" MinWidth="80" Checked="Setting_Changed"/>
-                    <RadioButton x:Name="Aniso4" Content="4x" GroupName="aniso" Style="{StaticResource Segment}" MinWidth="60" Checked="Setting_Changed"/>
-                    <RadioButton x:Name="Aniso8" Content="8x" GroupName="aniso" Style="{StaticResource Segment}" MinWidth="60" Checked="Setting_Changed"/>
-                    <RadioButton x:Name="Aniso16" Content="16x" GroupName="aniso" Style="{StaticResource Segment}" MinWidth="60" Checked="Setting_Changed"/>
-                  </StackPanel>
-                </Border>
-              </Grid>
-            </Border>
-
-            <TextBlock Style="{StaticResource Hint}" Margin="2,14,0,0">
-              Press F3 in game for the performance overlay.
-            </TextBlock>
-          </StackPanel>
-
-          <!-- CONTROLS -->
-          <Grid x:Name="PageControls" Visibility="Collapsed">
+        <!-- ===================== RIGHT: broadcast panel ===================== -->
+        <Border Grid.Column="1" Background="{StaticResource Panel}" BorderBrush="{StaticResource Gold}" BorderThickness="0,3,0,0">
+          <Grid>
             <Grid.RowDefinitions>
               <RowDefinition Height="Auto"/>
-              <RowDefinition Height="Auto"/>
               <RowDefinition Height="*"/>
+              <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <StackPanel>
-              <TextBlock Text="INPUT" Style="{StaticResource Overline}"/>
-              <TextBlock Text="Controls" Style="{StaticResource H1}" Margin="0,2,0,16"/>
-            </StackPanel>
-            <UniformGrid Grid.Row="1" Columns="2">
-              <RadioButton x:Name="CtlPad" Content="Controller" Tag="Xbox, PlayStation and other gamepads" GroupName="ctl" Style="{StaticResource OptionCard}" Checked="Setting_Changed"/>
-              <RadioButton x:Name="CtlKeys" Content="Keyboard" Tag="Play without a gamepad" GroupName="ctl" Style="{StaticResource OptionCard}" Margin="0" Checked="Setting_Changed"/>
-            </UniformGrid>
-            <Border Grid.Row="2" Style="{StaticResource CardBorder}" Margin="0,14,0,0" Padding="20,14" VerticalAlignment="Top">
-              <StackPanel>
-              <TextBlock Text="KEYBOARD KEYS" Style="{StaticResource Overline}" Foreground="{StaticResource Muted}" Margin="0,0,0,6"/>
-              <Grid x:Name="KeyMap">
-                <Grid.ColumnDefinitions>
-                  <ColumnDefinition/>
-                  <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-                <StackPanel x:Name="KeyMapLeft"/>
-                <StackPanel x:Name="KeyMapRight" Grid.Column="1" Margin="24,0,0,0"/>
-              </Grid>
-              </StackPanel>
-            </Border>
-          </Grid>
 
-          <!-- ABOUT -->
-          <StackPanel x:Name="PageAbout" Visibility="Collapsed">
-            <TextBlock Text="THE PROJECT" Style="{StaticResource Overline}"/>
-            <TextBlock Text="About" Style="{StaticResource H1}" Margin="0,2,0,16"/>
-            <Border Style="{StaticResource CardBorder}">
-              <StackPanel>
-                <TextBlock Text="2010 FIFA World Cup South Africa: Recompiled" Style="{StaticResource CardTitle}"/>
-                <TextBlock x:Name="AboutVersion" Style="{StaticResource Hint}" Margin="0,4,0,0"/>
-                <TextBlock Style="{StaticResource Hint}" Margin="0,10,0,0">
-                  An unofficial native PC port of the Xbox 360 game. Its code was translated to C++ with
-                  the ReXGlue recompiler, which builds on the Xenia project's research. No game files are included:
-                  it runs from your own copy.
+            <!-- nav + window buttons -->
+            <Grid Background="Transparent" MouseLeftButtonDown="Drag_MouseDown">
+              <StackPanel Orientation="Horizontal" Margin="40,18,0,0" VerticalAlignment="Bottom">
+                <RadioButton x:Name="TabPlay" Content="PLAY" GroupName="nav" Style="{StaticResource NavTab}" IsChecked="True" Checked="Tab_Checked"/>
+                <RadioButton x:Name="TabDisplay" Content="DISPLAY" GroupName="nav" Style="{StaticResource NavTab}" Checked="Tab_Checked"/>
+                <RadioButton x:Name="TabGraphics" Content="GRAPHICS" GroupName="nav" Style="{StaticResource NavTab}" Checked="Tab_Checked"/>
+                <RadioButton x:Name="TabControls" Content="CONTROLS" GroupName="nav" Style="{StaticResource NavTab}" Checked="Tab_Checked"/>
+                <RadioButton x:Name="TabAbout" Content="ABOUT" GroupName="nav" Style="{StaticResource NavTab}" Checked="Tab_Checked"/>
+              </StackPanel>
+              <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
+                <Button Content="&#xE921;" Style="{StaticResource CaptionButton}" Click="Minimize_Click" ToolTip="Minimize"/>
+                <Button Content="&#xE8BB;" Style="{StaticResource CloseButton}" Click="Close_Click" ToolTip="Close"/>
+              </StackPanel>
+            </Grid>
+            <Rectangle Height="1" Fill="{StaticResource Hair}" VerticalAlignment="Bottom" Margin="40,0,40,0"/>
+
+            <Grid Grid.Row="1" Margin="40,30,40,0">
+
+              <!-- PLAY -->
+              <StackPanel x:Name="PagePlay">
+                <TextBlock Text="YOUR COPY" Style="{StaticResource Label}"/>
+                <Grid Margin="0,6,0,0">
+                  <StackPanel Margin="0,0,130,0">
+                    <TextBlock x:Name="StatusTitle" Text="No game selected" Style="{StaticResource Title}"/>
+                    <TextBlock x:Name="StatusText" Text="Choose your Xbox 360 disc image, or drop it on this window."
+                               Style="{StaticResource Hint}" FontSize="13" Margin="0,4,0,0"/>
+                  </StackPanel>
+                  <!-- the check result, stamped on like a match ticket -->
+                  <Border x:Name="Stamp" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,4,6,0"
+                          BorderThickness="2.5" BorderBrush="{StaticResource Green}" Padding="12,3,12,2"
+                          RenderTransformOrigin="0.5,0.5" Visibility="Collapsed">
+                    <Border.RenderTransform><RotateTransform Angle="-7"/></Border.RenderTransform>
+                    <TextBlock x:Name="StampText" Text="VERIFIED" FontFamily="{StaticResource DisplayBold}" FontSize="22"
+                               Foreground="{StaticResource Green}"/>
+                  </Border>
+                  <TextBlock x:Name="Busy" Text="CHECKING" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,10,6,0"
+                             FontFamily="{StaticResource Caps}" FontSize="13" Foreground="{StaticResource Gold}" Visibility="Collapsed"/>
+                </Grid>
+                <TextBlock x:Name="GamePathText" Foreground="{StaticResource Dim}" FontSize="12" Margin="0,10,0,0"
+                           TextTrimming="CharacterEllipsis"/>
+                <StackPanel Orientation="Horizontal" Margin="4,16,0,0">
+                  <Button Content="CHOOSE DISC IMAGE" Style="{StaticResource SlantButton}" Click="BrowseIso_Click"/>
+                  <Button Content="USE A FOLDER" Style="{StaticResource SlantButton}" Margin="10,0,0,0" Click="BrowseFolder_Click"/>
+                </StackPanel>
+
+                <TextBlock Text="MATCH SETTINGS" Style="{StaticResource Label}" Margin="0,34,0,8"/>
+                <Button Style="{StaticResource SheetRow}" Tag="graphics" Click="SheetRow_Click">
+                  <Grid>
+                    <StackPanel Orientation="Horizontal">
+                      <TextBlock Text="01" Style="{StaticResource Num}"/>
+                      <TextBlock Text="Resolution" Style="{StaticResource RowName}"/>
+                    </StackPanel>
+                    <TextBlock x:Name="SumRes" HorizontalAlignment="Right" FontFamily="{StaticResource Caps}" FontSize="15"/>
+                  </Grid>
+                </Button>
+                <Button Style="{StaticResource SheetRow}" Tag="display" Click="SheetRow_Click">
+                  <Grid>
+                    <StackPanel Orientation="Horizontal">
+                      <TextBlock Text="02" Style="{StaticResource Num}"/>
+                      <TextBlock Text="Display" Style="{StaticResource RowName}"/>
+                    </StackPanel>
+                    <TextBlock x:Name="SumDisplay" HorizontalAlignment="Right" FontFamily="{StaticResource Caps}" FontSize="15"/>
+                  </Grid>
+                </Button>
+                <Button Style="{StaticResource SheetRow}" Tag="controls" Click="SheetRow_Click">
+                  <Grid>
+                    <StackPanel Orientation="Horizontal">
+                      <TextBlock Text="03" Style="{StaticResource Num}"/>
+                      <TextBlock Text="Controls" Style="{StaticResource RowName}"/>
+                    </StackPanel>
+                    <TextBlock x:Name="SumCtl" HorizontalAlignment="Right" FontFamily="{StaticResource Caps}" FontSize="15"/>
+                  </Grid>
+                </Button>
+                <Button Style="{StaticResource SheetRow}" Tag="display" Click="SheetRow_Click">
+                  <Grid>
+                    <StackPanel Orientation="Horizontal">
+                      <TextBlock Text="04" Style="{StaticResource Num}"/>
+                      <TextBlock Text="Frame rate" Style="{StaticResource RowName}"/>
+                    </StackPanel>
+                    <TextBlock x:Name="SumFps" HorizontalAlignment="Right" FontFamily="{StaticResource Caps}" FontSize="15"/>
+                  </Grid>
+                </Button>
+                <Rectangle Height="1" Fill="{StaticResource Hair}"/>
+              </StackPanel>
+
+              <!-- DISPLAY -->
+              <StackPanel x:Name="PageDisplay" Visibility="Collapsed">
+                <TextBlock Text="SCREEN" Style="{StaticResource Label}"/>
+                <TextBlock Text="Display" Style="{StaticResource Title}" Margin="0,4,0,18"/>
+                <Border Style="{StaticResource Row}">
+                  <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <StackPanel Margin="0,0,16,0">
+                      <TextBlock Text="Window mode" Style="{StaticResource RowName}"/>
+                      <TextBlock Text="Borderless switches instantly." Style="{StaticResource Hint}" Margin="0,3,0,0"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,6,0">
+                      <RadioButton x:Name="ModeWindow" Content="WINDOW" GroupName="mode" Style="{StaticResource Chip}" Checked="Setting_Changed"/>
+                      <RadioButton x:Name="ModeBorderless" Content="BORDERLESS" GroupName="mode" Style="{StaticResource Chip}" Checked="Setting_Changed"/>
+                      <RadioButton x:Name="ModeFullscreen" Content="FULLSCREEN" GroupName="mode" Style="{StaticResource Chip}" Checked="Setting_Changed" Margin="0"/>
+                    </StackPanel>
+                  </Grid>
+                </Border>
+                <Border Style="{StaticResource Row}">
+                  <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <StackPanel Margin="0,0,16,0">
+                      <TextBlock Text="Window size" Style="{StaticResource RowName}"/>
+                      <TextBlock Text="Used in window mode." Style="{StaticResource Hint}" Margin="0,3,0,0"/>
+                    </StackPanel>
+                    <ComboBox x:Name="WindowBox" Grid.Column="1" VerticalAlignment="Center" SelectionChanged="Setting_Changed"/>
+                  </Grid>
+                </Border>
+                <Border Style="{StaticResource Row}">
+                  <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <StackPanel Margin="0,0,16,0">
+                      <TextBlock Text="V-Sync" Style="{StaticResource RowName}"/>
+                      <TextBlock Text="No tearing. Leave it on unless your display has its own sync." Style="{StaticResource Hint}" Margin="0,3,0,0"/>
+                    </StackPanel>
+                    <CheckBox x:Name="VSyncBox" Grid.Column="1" Style="{StaticResource Switch}" VerticalAlignment="Center" Margin="0,0,8,0"
+                              Checked="Setting_Changed" Unchecked="Setting_Changed"/>
+                  </Grid>
+                </Border>
+                <Rectangle Height="1" Fill="{StaticResource Hair}"/>
+              </StackPanel>
+
+              <!-- GRAPHICS -->
+              <StackPanel x:Name="PageGraphics" Visibility="Collapsed">
+                <TextBlock Text="PICTURE" Style="{StaticResource Label}"/>
+                <TextBlock Text="Graphics" Style="{StaticResource Title}" Margin="0,4,0,18"/>
+                <TextBlock Text="Render resolution" Style="{StaticResource RowName}"/>
+                <TextBlock Text="The game draws at this size and is scaled to your screen. Higher is sharper and asks more of the graphics card."
+                           Style="{StaticResource Hint}" Margin="0,3,0,6"/>
+                <StackPanel Orientation="Horizontal">
+                  <RadioButton x:Name="Scale1" Content="720p" Tag="Original" GroupName="scale" Style="{StaticResource Score}" Checked="Setting_Changed"/>
+                  <RadioButton x:Name="Scale2" Content="1440p" Tag="Sharp, recommended" GroupName="scale" Style="{StaticResource Score}" Checked="Setting_Changed"/>
+                  <RadioButton x:Name="Scale3" Content="4K" Tag="Ultra, strong card" GroupName="scale" Style="{StaticResource Score}" Checked="Setting_Changed"/>
+                </StackPanel>
+                <Border Style="{StaticResource Row}" Margin="0,20,0,0">
+                  <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <StackPanel Margin="0,0,16,0">
+                      <TextBlock Text="Texture filtering" Style="{StaticResource RowName}"/>
+                      <TextBlock Text="Keeps the pitch sharp toward the far touchline." Style="{StaticResource Hint}" Margin="0,3,0,0"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,6,0">
+                      <RadioButton x:Name="AnisoOff" Content="OFF" GroupName="aniso" Style="{StaticResource Chip}" Checked="Setting_Changed"/>
+                      <RadioButton x:Name="Aniso4" Content="4X" GroupName="aniso" Style="{StaticResource Chip}" Checked="Setting_Changed"/>
+                      <RadioButton x:Name="Aniso8" Content="8X" GroupName="aniso" Style="{StaticResource Chip}" Checked="Setting_Changed"/>
+                      <RadioButton x:Name="Aniso16" Content="16X" GroupName="aniso" Style="{StaticResource Chip}" Checked="Setting_Changed" Margin="0"/>
+                    </StackPanel>
+                  </Grid>
+                </Border>
+                <Rectangle Height="1" Fill="{StaticResource Hair}"/>
+                <TextBlock Style="{StaticResource Hint}" Margin="0,14,0,0">F3 in game shows the frame rate.</TextBlock>
+              </StackPanel>
+
+              <!-- CONTROLS -->
+              <StackPanel x:Name="PageControls" Visibility="Collapsed">
+                <TextBlock Text="INPUT" Style="{StaticResource Label}"/>
+                <Grid Margin="0,4,0,16">
+                  <TextBlock Text="Controls" Style="{StaticResource Title}"/>
+                  <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,6,0">
+                    <RadioButton x:Name="CtlPad" Content="CONTROLLER" GroupName="ctl" Style="{StaticResource Chip}" Checked="Setting_Changed"/>
+                    <RadioButton x:Name="CtlKeys" Content="KEYBOARD" GroupName="ctl" Style="{StaticResource Chip}" Checked="Setting_Changed" Margin="0"/>
+                  </StackPanel>
+                </Grid>
+                <TextBlock x:Name="CtlHint" Style="{StaticResource Hint}" Margin="0,0,0,12"/>
+                <Grid>
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                  </Grid.ColumnDefinitions>
+                  <StackPanel x:Name="KeyMapLeft" Margin="0,0,14,0"/>
+                  <StackPanel x:Name="KeyMapRight" Grid.Column="1" Margin="14,0,0,0"/>
+                </Grid>
+              </StackPanel>
+
+              <!-- ABOUT -->
+              <StackPanel x:Name="PageAbout" Visibility="Collapsed">
+                <TextBlock Text="THE PROJECT" Style="{StaticResource Label}"/>
+                <TextBlock Text="About" Style="{StaticResource Title}" Margin="0,4,0,14"/>
+                <TextBlock Style="{StaticResource Hint}" FontSize="13.5" Foreground="#C9C8BF" LineHeight="21">
+                  An unofficial native PC port of the Xbox 360 game. Its code was translated to C++
+                  with the ReXGlue recompiler, which builds on the Xenia project's research.
+                  It runs from your own copy; no game files are included.
+                </TextBlock>
+                <TextBlock x:Name="AboutVersion" Style="{StaticResource Hint}" Margin="0,10,0,0"/>
+                <WrapPanel Margin="4,22,0,0">
+                  <Button Content="SAVES AND LOGS" Style="{StaticResource SlantButton}" Click="OpenDataFolder_Click" Margin="0,0,10,10"/>
+                  <Button Content="DESKTOP SHORTCUT" Style="{StaticResource SlantButton}" Click="Shortcut_Click" Margin="0,0,10,10"/>
+                  <Button Content="RESET SETTINGS" Style="{StaticResource SlantButton}" Click="Reset_Click" Margin="0,0,10,10"/>
+                </WrapPanel>
+                <TextBlock Style="{StaticResource Hint}" Margin="0,18,0,0" FontSize="11.5" Foreground="{StaticResource Dim}">
+                  Fan project, not affiliated with or endorsed by EA, FIFA or Microsoft. Trademarks belong to their owners.
                 </TextBlock>
               </StackPanel>
-            </Border>
-            <Border Style="{StaticResource CardBorder}" Margin="0,12,0,0">
-              <WrapPanel>
-                <Button Style="{StaticResource GhostButton}" Click="OpenDataFolder_Click" Margin="0,0,10,0">
-                  <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="&#xE838;" FontFamily="Segoe MDL2 Assets" Margin="0,1,8,0" Foreground="{StaticResource Gold}"/>
-                    <TextBlock Text="Saves and logs"/>
-                  </StackPanel>
-                </Button>
-                <Button Style="{StaticResource GhostButton}" Click="Shortcut_Click" Margin="0,0,10,0">
-                  <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="&#xE71B;" FontFamily="Segoe MDL2 Assets" Margin="0,1,8,0" Foreground="{StaticResource Gold}"/>
-                    <TextBlock Text="Desktop shortcut"/>
-                  </StackPanel>
-                </Button>
-                <Button Style="{StaticResource GhostButton}" Click="Reset_Click">
-                  <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="&#xE777;" FontFamily="Segoe MDL2 Assets" Margin="0,1,8,0" Foreground="{StaticResource Gold}"/>
-                    <TextBlock Text="Reset settings"/>
-                  </StackPanel>
-                </Button>
-              </WrapPanel>
-            </Border>
-            <TextBlock Style="{StaticResource Hint}" Margin="2,14,0,0" FontSize="11.5" Foreground="{StaticResource Dim}">
-              Fan project, not affiliated with or endorsed by EA, FIFA or Microsoft. All trademarks belong to their owners.
-            </TextBlock>
-          </StackPanel>
-        </Grid>
+            </Grid>
 
-        <!-- bottom bar -->
-        <Border Grid.Row="2" Margin="34,12,34,26" Padding="0,16,0,0" BorderBrush="{StaticResource Line}" BorderThickness="0,1,0,0">
-          <Grid>
-            <StackPanel VerticalAlignment="Center">
-              <StackPanel Orientation="Horizontal">
-                <Ellipse x:Name="ReadyDot" Width="9" Height="9" Fill="{StaticResource Dim}" VerticalAlignment="Center"/>
-                <TextBlock x:Name="ReadyText" Text="Choose your game to play" Margin="9,0,0,0" FontFamily="{StaticResource DisplayWide}" FontSize="15"/>
+            <!-- status + kick off -->
+            <Grid Grid.Row="2" Margin="40,0,40,34">
+              <StackPanel VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal">
+                  <Rectangle x:Name="ReadyDot" Width="10" Height="10" Fill="{StaticResource Dim}" VerticalAlignment="Center">
+                    <Rectangle.RenderTransform><SkewTransform AngleX="-14"/></Rectangle.RenderTransform>
+                  </Rectangle>
+                  <TextBlock x:Name="ReadyText" Text="CHOOSE YOUR GAME" Margin="10,0,0,0" FontFamily="{StaticResource Caps}" FontSize="15"/>
+                </StackPanel>
+                <TextBlock x:Name="ToastText" Style="{StaticResource Hint}" Margin="20,3,0,0" FontSize="12"/>
               </StackPanel>
-              <TextBlock x:Name="ToastText" Style="{StaticResource Hint}" Margin="18,3,0,0" FontSize="12"/>
-            </StackPanel>
-            <Button x:Name="PlayButton" Content="PLAY" Style="{StaticResource PlayButton}" HorizontalAlignment="Right"
-                    Click="Play_Click" IsEnabled="False" IsDefault="True"/>
+              <Button x:Name="PlayButton" Content="KICK OFF" Style="{StaticResource KickOff}" HorizontalAlignment="Right"
+                      Click="Play_Click" IsEnabled="False" IsDefault="True"/>
+            </Grid>
           </Grid>
         </Border>
       </Grid>
 
-      <!-- drop overlay -->
-      <Border x:Name="DropOverlay" Grid.ColumnSpan="2" CornerRadius="16" Background="#D90C1310" Visibility="Collapsed"
-              BorderBrush="{StaticResource Gold}" BorderThickness="2" IsHitTestVisible="False">
+      <!-- drop target -->
+      <Grid x:Name="DropOverlay" Background="#E6050607" Visibility="Collapsed" IsHitTestVisible="False">
+        <Border BorderBrush="{StaticResource Gold}" BorderThickness="2" Margin="60" >
+          <Border.RenderTransform><SkewTransform AngleX="-6"/></Border.RenderTransform>
+        </Border>
         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-          <TextBlock Text="&#xE896;" FontFamily="Segoe MDL2 Assets" FontSize="46" Foreground="{StaticResource Gold}" HorizontalAlignment="Center"/>
-          <TextBlock Text="DROP YOUR DISC IMAGE" FontFamily="{StaticResource Display}" FontSize="32" Margin="0,12,0,0" HorizontalAlignment="Center"/>
+          <TextBlock Text="DROP YOUR DISC IMAGE" FontFamily="{StaticResource DisplayBold}" FontSize="54" HorizontalAlignment="Center"/>
+          <TextBlock Text="Xbox 360 .iso, or the folder with default.xex" Style="{StaticResource Hint}" FontSize="14" HorizontalAlignment="Center"/>
         </StackPanel>
-      </Border>
+      </Grid>
     </Grid>
   </Border>
 </Window>

@@ -11,7 +11,7 @@ Getting started
 2. Click "Choose disc image" and pick your Xbox 360 disc image, or drop it on the
    window ("Game folder" works for a folder with default.xex and fifadllzf.xex).
    The launcher checks that it is the right version.
-3. Press PLAY.
+3. Press KICK OFF.
 
 Launcher pages
 --------------
