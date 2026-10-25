@@ -12,7 +12,7 @@
 *.prx
 
 # Local only: the SDK (tools/setup_sdk.ps1), everything built (out/)
-# and the C++ generated from the game (recomp/generated/)
+# and the C++ generated from the game (pc/generated/)
 /rexglue-sdk/
 /out/
 **/generated/

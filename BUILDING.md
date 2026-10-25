@@ -21,35 +21,24 @@ That's the whole build. `build.ps1`:
 
 1. The first time, gets the ReXGlue SDK ready in `rexglue-sdk\` (`tools\setup_sdk.ps1`): clones
    [ReXGlue](https://github.com/rexglue/rexglue-sdk), pins commit `bd833a2`, fixes git symlinks on Windows,
-   applies `patches\rexglue-sdk\*.patch`, then builds and installs it.
+   applies the [SDK patches](patches/rexglue-sdk/README.md), then builds and installs it.
 2. Takes `default.xex` and `fifadllzf.xex` from your disc image into `out\game-files\`.
-3. Runs the ReXGlue code generator (`recomp\fifawc10_manifest.toml` and `recomp\config\*.toml`) and builds
+3. Runs the ReXGlue code generator (`pc\fifawc10_manifest.toml` and `pc\config\*.toml`) and builds
    `out\build\win-amd64-release\fifawc10.exe`. Later runs only regenerate and rebuild what changed.
-4. With `-Package`: publishes the launcher and puts the game, the launcher, the Visual C++ runtime and the
-   licenses in `out\package\FIFA World Cup 2010 Recompiled\`, plus
-   `out\FIFA-World-Cup-2010-Recompiled-<version>-win-x64.zip`.
+4. With `-Package` (`installer\package.ps1`): publishes the launcher and puts the game, the launcher, the
+   Visual C++ runtime and the licenses in `out\package\FIFA World Cup 2010 Recompiled\`, makes
+   `out\FIFA-World-Cup-2010-Recompiled-<version>-win-x64.zip`, and copies the game and launcher into the
+   repository folder, so you can play from there.
 
 Options: `-Game <path>` for a disc image or game folder somewhere else, `-Config relwithdebinfo` for a build
 with debug info.
 
-Everything the build makes from your game (`out\`, `recomp\generated\`) stays on your PC and is git-ignored,
-like the SDK checkout. The version comes from `VERSION` (also set in `launcher\Launcher.csproj`).
-
-## SDK patches
-
-| Patch | What it does |
-|---|---|
-| 0001 | Builds the USB camera kernel exports the game imports |
-| 0002 | Finds a module loaded by bare file name (`fifadllzf.xex`) |
-| 0003 | `function_table_base`: moves a module's dispatch table so `default.xex` and `fifadllzf.xex` don't collide |
-| 0004 | Precise guest vblank timing (high-resolution timer instead of `Sleep(1)`) |
-| 0005 | Lets `game_data_root` be an Xbox 360 disc image (`.iso`) |
-| 0006 | `frame_rate_limit` (the launcher's 30 fps option) and a count of presented frames for the FPS counter |
-| 0007 | Overlays that only change with the game's frames don't keep the window repainting at the display's refresh rate |
+Everything the build makes (`out\`, `pc\generated\`, the `.exe` and `.dll` files) stays on your PC and is
+git-ignored, like the SDK checkout. The version comes from `VERSION` (also set in `launcher\Launcher.csproj`).
 
 ## Settings the game needs
 
-Set by the game itself (`recomp\src\fifawc10_app.h`) unless the config file says otherwise:
+Set by the game itself (`pc\src\fifawc10_app.h`) unless the config file says otherwise:
 
 | Setting | Why |
 |---|---|
@@ -61,23 +50,25 @@ Set by the game itself (`recomp\src\fifawc10_app.h`) unless the config file says
 | Path | What |
 |---|---|
 | `build.ps1` | The build, start to finish |
-| `recomp/fifawc10_manifest.toml` | Codegen manifest: `default.xex` and the `fifadllzf.xex` game module |
-| `recomp/config/` | Analysis overrides: missed function starts, code pointers, setjmp/longjmp |
-| `recomp/src/` | The Windows app: paths, game settings, FPS counter, crash handler, launcher hand-off |
-| `recomp/src/module/` | Hooks compiled into the game module's DLL (boot fix, Lua error log) |
-| `recomp/res/` | Icon and version resource of `fifawc10.exe` |
+| `pc/fifawc10_manifest.toml` | Codegen manifest: `default.xex` and the `fifadllzf.xex` game module |
+| `pc/config/` | Analysis overrides: missed function starts, code pointers, setjmp/longjmp |
+| `pc/src/` | The Windows app: paths, game settings, FPS counter, crash handler, launcher hand-off |
+| `pc/fixes/` | Hooks compiled into the game module's DLL (boot fix, Lua error log) |
+| `pc/res/` | Icon and version resource of `fifawc10.exe` |
 | `launcher/` | WPF launcher: game check, settings, start (`Theme.xaml` holds the look) |
-| `patches/rexglue-sdk/` | SDK patches |
-| `tools/` | `setup_sdk.ps1`, `package.ps1`, `disc.py` (Xbox 360 / PS3 disc images), `fix_symlinks.py`, `make_icon.ps1` |
-| `tools/analysis/` | Reverse-engineering helpers (below) |
+| `installer/` | Release packaging (`package.ps1`) and the player readme shipped in the zip |
+| `patches/rexglue-sdk/` | SDK patches, with their own [README](patches/rexglue-sdk/README.md) |
+| `tools/` | SDK setup, disc images (`disc.py`), and the reverse-engineering helpers below |
+| `.github/` | Issue form |
 
-Local only (git-ignored): `rexglue-sdk/`, `out/`, `recomp/generated/`, your `.iso`.
-
-## Analysis tools (`tools/analysis/`)
+## Tools (`tools/`)
 
 | Tool | Use |
 |---|---|
-| `xexinfo.py`, `xeximage.py` | XEX headers; decrypted, decompressed memory image (LZX through `lzxdec.exe`) |
+| `setup_sdk.ps1`, `fix_symlinks.py` | Get the SDK ready (run by `build.ps1`) |
+| `disc.py` | Detect, list and extract Xbox 360 and PS3 disc images |
+| `make_icon.ps1` | Draws `launcher\icon.ico` |
+| `xexinfo.py`, `xeximage.py` | XEX headers; decrypted, decompressed memory image (LZX through `lzxdec.exe`, from `lzxdec\`) |
 | `ppcdis.py` | PowerPC disassembly of an image, PE sections, `.pdata` lookup |
 | `autofix_codegen.py` | Re-runs codegen and adds missed function starts until analysis passes |
 | `find_code_pointers.py` | Finds functions only reached through pointers (vtables, callbacks) |

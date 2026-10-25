@@ -8,7 +8,7 @@
 # puts everything a player needs in out\package plus a zip.
 #
 # -Game defaults to the first .iso in this folder. Everything the build makes from the game
-# (out\, recomp\generated\) is git-ignored and stays on your PC.
+# (out\, pc\generated\) is git-ignored and stays on your PC.
 param(
   [string]$Game = "",
   [string]$Config = "release",
@@ -17,7 +17,7 @@ param(
 $ErrorActionPreference = "Stop"
 $repo = $PSScriptRoot
 $sdk = Join-Path $repo "rexglue-sdk"
-$recomp = Join-Path $repo "recomp"
+$pc = Join-Path $repo "pc"
 $gameFiles = Join-Path $repo "out\game-files"
 
 if (-not $Game) {
@@ -40,7 +40,7 @@ if (Test-Path $Game -PathType Leaf) {
 }
 
 # 3. Code generation and build
-Push-Location $recomp
+Push-Location $pc
 try {
   & $rex codegen fifawc10_manifest.toml
   if ($LASTEXITCODE) { throw "codegen failed" }
@@ -63,4 +63,4 @@ try {
 Write-Host "Built: $repo\out\build\win-amd64-$Config\fifawc10.exe" -ForegroundColor Green
 
 # 4. Player package
-if ($Package) { & (Join-Path $repo "tools\package.ps1") -Config $Config }
+if ($Package) { & (Join-Path $repo "installer\package.ps1") -Config $Config }

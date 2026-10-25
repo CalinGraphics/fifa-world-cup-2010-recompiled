@@ -48,6 +48,6 @@ try {
   # lzxdec.exe for tools\xeximage.py (LZX-compressed XEX images), from the SDK's libmspack.
   $mspack = Join-Path $Sdk "thirdparty\libmspack\libmspack\mspack"
   & "C:\Program Files\LLVM\bin\clang.exe" -O2 -w -D_CRT_SECURE_NO_WARNINGS -I"$mspack" `
-    (Join-Path $repo "tools\analysis\lzxdec\lzxdec.c") (Join-Path $mspack "lzxd.c") -o (Join-Path $repo "tools\analysis\lzxdec.exe")
+    (Join-Path $repo "tools\lzxdec\lzxdec.c") (Join-Path $mspack "lzxd.c") -o (Join-Path $repo "tools\lzxdec.exe")
 } finally { Pop-Location }
 Write-Host "SDK ready: $Sdk\out\install\win-amd64" -ForegroundColor Green

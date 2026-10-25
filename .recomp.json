@@ -1,0 +1,15 @@
+{
+  "game": "2010 FIFA World Cup South Africa",
+  "system": "Xbox 360",
+  "type": "recomp",
+  "project": "2010 FIFA World Cup South Africa: Recompiled",
+  "status": "released",
+  "targets": ["Windows"],
+  "toolchain": "ReXGlue",
+  "approach": "Static recompilation of the Xbox 360 PowerPC code to C++ with ReXGlue, Direct3D 12 renderer",
+  "maintainers": [{ "name": "CalinGraphics", "link": "https://github.com/CalinGraphics" }],
+  "links": [
+    { "label": "Releases", "url": "https://github.com/CalinGraphics/fifa-world-cup-2010-recompiled/releases" }
+  ],
+  "notes": "Unofficial Windows port with a launcher for setup and settings. Needs your own copy of the game; no game files are included."
+}

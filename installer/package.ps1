@@ -1,6 +1,6 @@
 # Puts the built game, the launcher and the runtime files in one folder and zips it.
 #
-#   powershell -ExecutionPolicy Bypass -File tools\package.ps1 [-Config release]   (or: build.ps1 -Package)
+#   powershell -ExecutionPolicy Bypass -File installer\package.ps1 [-Config release]   (or: build.ps1 -Package)
 #
 # Output: out\package\FIFA World Cup 2010 Recompiled\ and out\FIFA-World-Cup-2010-Recompiled-<version>-win-x64.zip
 # The package holds no game files: players point the launcher at their own disc image.
@@ -45,7 +45,7 @@ Get-ChildItem (Join-Path $Sdk "thirdparty") -Directory | ForEach-Object {
   }
   if ($lic) { Copy-Item $lic.FullName (Join-Path $pkg "licenses\$($_.Name).txt") }
 }
-Copy-Item (Join-Path $repo "docs\PLAYING.txt") (Join-Path $pkg "README.txt")
+Copy-Item (Join-Path $repo "installer\README.txt") (Join-Path $pkg "README.txt")
 
 # Zip
 $zip = Join-Path $outRoot "FIFA-World-Cup-2010-Recompiled-$version-win-x64.zip"

@@ -55,7 +55,7 @@ endif()
 # Hooks for functions in the game module (fifadllzf.xex) have to live in its DLL.
 if(TARGET fifawc10_fifadllzf)
     target_sources(fifawc10_fifadllzf PRIVATE
-        src/module/boot_fixes.cpp
-        src/module/lua_diagnostics.cpp)
+        fixes/boot_fixes.cpp
+        fixes/lua_diagnostics.cpp)
 endif()
 

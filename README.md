@@ -133,13 +133,12 @@ Requirements and details are in [BUILDING.md](BUILDING.md).
 | Path | What it is |
 |---|---|
 | [`build.ps1`](build.ps1) | The whole build: SDK, code generation, game, launcher, release zip |
-| [`recomp/`](recomp/) | The Windows app (`src/`), the game-module hooks (`src/module/`), the codegen manifest and analysis overrides (`config/`) |
+| [`pc/`](pc/) | The Windows app (`src/`), hooks in the game module (`fixes/`), the codegen manifest and analysis overrides (`config/`) |
 | [`launcher/`](launcher/) | The launcher (WPF, .NET 10): game check, settings, start |
+| [`installer/`](installer/) | Release packaging and the player readme shipped in the zip |
 | [`patches/rexglue-sdk/`](patches/rexglue-sdk/) | Changes to the ReXGlue SDK, applied on top of a fixed SDK commit |
-| [`tools/`](tools/) | SDK setup, packaging, disc image reader, reverse-engineering helpers used while porting |
-| [`docs/`](docs/) | Player readme (shipped in the zip) and images |
-
-The C++ translated from the game (`recomp/generated/`) isn't part of this repository. It's generated on your
+| [`tools/`](tools/) | SDK setup, disc image reader, reverse-engineering helpers used while porting |
+The C++ translated from the game (`pc/generated/`) isn't part of this repository. It's generated on your
 own PC from your own copy of the game when you build.
 
 ## Credits
