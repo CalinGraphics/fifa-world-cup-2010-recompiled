@@ -24,3 +24,4 @@ cmake --build out/build/win-amd64 --config Release --target install
 | 0005 disc-image-game-root | Lets `game_data_root` be an Xbox 360 disc image (`.iso`) |
 | 0006 frame-rate-limit-and-swap-count | `frame_rate_limit` (the launcher's 30 fps option) and a count of presented frames for the FPS counter |
 | 0007 dialogs-without-continuous-repaint | Overlays that only change with the game's frames don't keep the window repainting at the display's refresh rate |
+| 0008 aggregate-enumerator-user-saves | `XamContentAggregateCreateEnumerator` also lists the signed-in user's saves when the game asks for any user, any content type, or the xuid cut to its low 32 bits (this game does that). The game found none, asked for the profile setup on every start and wrote a new save file each time |
