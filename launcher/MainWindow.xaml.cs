@@ -35,6 +35,53 @@ public partial class MainWindow : Window
         loading = false;
         UpdateSummary();
         UpdateGame(settings.GamePath);
+        Loaded += async (_, _) => await CheckForUpdate();
+    }
+
+    // ---------------------------------------------------------------- updates
+
+    Updater.Release? update;
+
+    async Task CheckForUpdate()
+    {
+        try
+        {
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            update = await Updater.CheckAsync(cts.Token);
+        }
+        catch { update = null; /* offline or GitHub unreachable: play as usual */ }
+        if (update is null) return;
+        UpdateButton.Content = $"UPDATE TO {update.Version}";
+        UpdateButton.Visibility = Visibility.Visible;
+        ToastText.BeginAnimation(OpacityProperty, null);
+        ToastText.Opacity = 1;
+        ToastText.Text = $"Version {update.Version} is out.";
+    }
+
+    async void Update_Click(object sender, RoutedEventArgs e)
+    {
+        if (update is null) return;
+        if (Process.GetProcessesByName("fifawc10").Length > 0)
+        {
+            Toast("Close the game first, then update.");
+            return;
+        }
+        UpdateButton.IsEnabled = false;
+        PlayButton.IsEnabled = false;
+        var progress = new Progress<double>(p => UpdateButton.Content = $"DOWNLOADING {p:P0}");
+        try
+        {
+            await Updater.InstallAsync(update, progress, CancellationToken.None);
+            UpdateButton.Content = "INSTALLING";
+            Application.Current.Shutdown();   // the install script waits for this, then reopens the launcher
+        }
+        catch (Exception ex)
+        {
+            UpdateButton.Content = $"UPDATE TO {update.Version}";
+            UpdateButton.IsEnabled = true;
+            PlayButton.IsEnabled = check is { Playable: true };
+            Toast($"The update didn't go through: {ex.Message}");
+        }
     }
 
     // ---------------------------------------------------------------- window chrome

@@ -46,6 +46,8 @@ and compiled for Windows, with a Direct3D 12 renderer. No emulator.
 
 Quit with **Alt+F4**; the game saves automatically.
 
+**Updates:** when a new version is out, the launcher shows an **Update** button next to Kick off. One click downloads it, checks it and replaces the program files; your saves and settings stay.
+
 ### The launcher
 
 | Page | Settings |

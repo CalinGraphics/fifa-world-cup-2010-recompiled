@@ -74,9 +74,18 @@ Set by the game itself (`pc\src\fifawc10_app.h`) unless the config file says oth
 | `find_code_pointers.py` | Finds functions only reached through pointers (vtables, callbacks) |
 | `find_setjmp.py`, `xref.py`, `callers.py` | Locate setjmp/longjmp, cross-references, callers |
 
+## Releasing an update
+
+The launcher checks the latest GitHub release when it opens. For it to offer an update:
+
+1. Raise `VERSION` and `<Version>` in `launcher\Launcher.csproj`, then `build.ps1 -Package`.
+2. Create a release tagged `v<version>` (e.g. `v0.3.2`) and attach `FIFA-World-Cup-2010-Recompiled-<version>-win-x64.zip`.
+3. Put the zip's SHA-256 in the release notes: the launcher checks the download against it.
+
 ## Developer switches
 
 Environment variables read by `fifawc10.exe`:
 
 - `FIFAWC10_PERF_LOG=1` logs the frame rate once a second
 - `FIFAWC10_WATCH=<address>` logs every guest write to a word, with the host stack
+- `FIFAWC10_UPDATE_FEED=<url>` (launcher) reads the release from that URL instead of GitHub, for testing an update

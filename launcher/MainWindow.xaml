@@ -313,6 +313,8 @@
                 </StackPanel>
                 <TextBlock x:Name="ToastText" Style="{StaticResource Hint}" Margin="20,3,0,0" FontSize="12"/>
               </StackPanel>
+              <Button x:Name="UpdateButton" Style="{StaticResource SlantButton}" HorizontalAlignment="Right" VerticalAlignment="Center"
+                      Margin="0,0,236,0" Visibility="Collapsed" Click="Update_Click"/>
               <Button x:Name="PlayButton" Content="KICK OFF" Style="{StaticResource KickOff}" HorizontalAlignment="Right"
                       Click="Play_Click" IsEnabled="False" IsDefault="True"/>
             </Grid>
